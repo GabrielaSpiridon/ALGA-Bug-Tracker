@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import MyHome from './pages/MyHome';
 import Projects from './pages/Projects';
 import Bugs from './pages/Bugs';
@@ -37,11 +38,36 @@ function App() {
           {/* Default route is login if not authenticated */}
           <Route 
             path="/" 
-            element={isAuthenticated ? <Navigate to="/myHome" /> : <Login onLoginSuccess={handleLoginSuccess} />} 
+            element={isAuthenticated ? <Navigate to="/myHome" /> : (
+              <div>
+                <Login onLoginSuccess={handleLoginSuccess} />
+                <div className="text-center mt-3">
+                  <Link to="/register" className="btn btn-secondary">Go to Register</Link>
+                </div>
+              </div>
+            )} 
           />
           <Route 
             path="/login" 
-            element={isAuthenticated ? <Navigate to="/myHome" /> : <Login onLoginSuccess={handleLoginSuccess} />} 
+            element={isAuthenticated ? <Navigate to="/myHome" /> : (
+              <div>
+                <Login onLoginSuccess={handleLoginSuccess} />
+                <div className="text-center mt-3">
+                  <Link to="/register" className="btn btn-secondary">Go to Register</Link>
+                </div>
+              </div>
+            )} 
+          />
+          <Route 
+            path="/register" 
+            element={
+              <div>
+                <Register />
+                <div className="text-center mt-3">
+                  <Link to="/login" className="btn btn-secondary">Back to Login</Link>
+                </div>
+              </div>
+            } 
           />
           <Route 
             path="/myHome" 

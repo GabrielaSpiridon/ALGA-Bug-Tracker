@@ -1,0 +1,4 @@
+npm install mariadb
+npm install express
+npm install cors
+npm install axios

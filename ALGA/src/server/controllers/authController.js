@@ -33,7 +33,7 @@ export async function register(req, res) {
   const userId = await createUser(user_email, user_name, password);
   if (userId) {
     // User successfully created; return the new user's ID
-    return res.json({ userId });
+    return res.json({ userId: Number(userId) });
   } else {
     return res.status(500).send("unable to create user");
   }

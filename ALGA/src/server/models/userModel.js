@@ -4,7 +4,7 @@ export async function getUserByEmailAndPassword(email, password) {
   const conn = await pool.getConnection();
   try {
     const rows = await conn.query(
-      "SELECT id_user, nume_user, email_user FROM USER WHERE email_user = ? AND parola_user = ? LIMIT 1",
+      "SELECT id_user, user_name, user_email FROM USER WHERE user_email = ? AND user_password = ? LIMIT 1",
       [email, password]
     );
     return rows.length > 0 ? rows[0] : null;
@@ -13,11 +13,11 @@ export async function getUserByEmailAndPassword(email, password) {
   }
 }
 
-export async function createUser(email, name, password) {
+export async function createUser(name, email, password) {
   const conn = await pool.getConnection();
   try {
     const result = await conn.query(
-      "INSERT INTO USER(nume_user, email_user, parola_user) VALUES(?,?,?)",
+      "INSERT INTO USER(user_name, user_email, user_password) VALUES(?,?,?)",
       [name, email, password]
     );
     return result.insertId || null;
@@ -35,10 +35,8 @@ async function testCreateUser() {
     const testEmail = `testuser_${Date.now()}@example.com`;
     const testName = 'Test User';
     const testPassword = 'testpassword';
-  
-   // const await testCreateUser();
 
-    const userId = await createUser(testEmail, testName, testPassword);
+    const userId = await createUser(testName, testEmail, testPassword);
   
     if (userId) {
       console.log(`User created successfully with ID: ${userId}`);
