@@ -73,7 +73,7 @@ function Login({ onLoginSuccess }) {
           <div className="mb-3">
             <input 
               type="text" 
-              placeholder="Username"
+              placeholder="User email"
               value={username}
               onChange={(e) => setUsername(e.target.value)} 
               className="form-control"

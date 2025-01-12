@@ -30,7 +30,7 @@ export async function register(req, res) {
     return res.status(400).send("Missing parameters");
   }
 
-  const userId = await createUser(user_email, user_name, password);
+  const userId = await createUser(user_name,user_email, password);
   if (userId) {
     // User successfully created; return the new user's ID
     return res.json({ userId: Number(userId) });
