@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";
+import axios from 'axios';
 
 function Login({ onLoginSuccess }) {
   // State variables for input fields
+  const [user_email, setUserEmail] = useState(''); 
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
   
@@ -22,8 +24,8 @@ function Login({ onLoginSuccess }) {
     if (isRegisterMode) {
       // Registration logic using Axios
       const requestBody = {
-        user_email: username,
-        user_name: username, // If you want to separate email and username, create another input field
+        user_email: user_email,
+        user_name: username, 
         password: password
       };
 
@@ -32,6 +34,7 @@ function Login({ onLoginSuccess }) {
         // If successful, response.data should contain { userId: ... }
         alert(`User registered successfully! User ID: ${response.data.userId}`);
         setIsRegisterMode(false);
+        setUserEmail('');
         setUsername('');
         setPassword('');
       } catch (err) {
@@ -49,11 +52,9 @@ function Login({ onLoginSuccess }) {
         password: password
       };
       const response = await axios.post('http://localhost:3000/auth/login', requestBody);
-      const result = await response.json();
-      
-      if (result.success) {
-        alert(`login successful`);
 
+      if (response.data.success) {
+        alert(`login successful`);
         setIsRegisterMode(true);
         onLoginSuccess();
         navigate('/myHome');
