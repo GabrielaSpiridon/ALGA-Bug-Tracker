@@ -1,9 +1,9 @@
 import mariadb from 'mariadb';
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
-  user: 'remi',
-  password: 'remiPWD',
+  host: 'localhost',
+  user: 'root',
+  password: 'gabriela2003',
   database: 'TEST_MANAGER_DB',
   connectionLimit: 5
 });

@@ -71,7 +71,7 @@ function Login({ onLoginSuccess }) {
 
       } else {
         setIsRegisterMode(false);
-        alert('Invalid credentials');
+        alert(`Invalid credentials`);
       }
     
     }
