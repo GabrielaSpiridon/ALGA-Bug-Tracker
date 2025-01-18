@@ -13,7 +13,7 @@ export async function getUserByEmailAndPassword(email, password) {
   }
 }
 
-export async function createUser(name, email, password) {
+export async function createUser(email, name, password) {
   const conn = await pool.getConnection();
   try {
     const result = await conn.query(
@@ -36,7 +36,7 @@ async function testCreateUser() {
     const testName = 'Test User';
     const testPassword = 'testpassword';
 
-    const userId = await createUser(testName, testEmail, testPassword);
+    const userId = await createUser(testEmail, testName, testPassword);
   
     if (userId) {
       console.log(`User created successfully with ID: ${userId}`);

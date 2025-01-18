@@ -1,11 +1,14 @@
+// login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from 'axios';
 
+import configuration from '../configuration.js';
+
+
 function Login({ onLoginSuccess }) {
   // State variables for input fields
-  const [user_email, setUserEmail] = useState(''); 
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
   
@@ -24,8 +27,8 @@ function Login({ onLoginSuccess }) {
     if (isRegisterMode) {
       // Registration logic using Axios
       const requestBody = {
-        user_email: user_email,
-        user_name: username, 
+        user_email: username,
+        user_name: username, // If you want to separate email and username, create another input field
         password: password
       };
 
@@ -34,7 +37,6 @@ function Login({ onLoginSuccess }) {
         // If successful, response.data should contain { userId: ... }
         alert(`User registered successfully! User ID: ${response.data.userId}`);
         setIsRegisterMode(false);
-        setUserEmail('');
         setUsername('');
         setPassword('');
       } catch (err) {
@@ -52,12 +54,21 @@ function Login({ onLoginSuccess }) {
         password: password
       };
       const response = await axios.post('http://localhost:3000/auth/login', requestBody);
-
-      if (response.data.success) {
+      const result = response.data; // Axios automatically parses JSON const result = await response.json();
+      
+      if (result.success) {
         alert(`login successful`);
+
+        configuration.currentUserId = result.userId; // Save userId in config
+       // localStorage.setItem('userId', result.userId); // Save userId in localStorage
+        
         setIsRegisterMode(true);
         onLoginSuccess();
-        navigate('/myHome');
+        
+      navigate('/myHome'); // Redirect to myHome
+
+       // transferam datele intre ecrane prin  configuration navigate('/myHome', { state: { userId: result.userId } }); // Pass userId from response
+
       } else {
         setIsRegisterMode(false);
         alert('Invalid credentials');
@@ -74,7 +85,7 @@ function Login({ onLoginSuccess }) {
           <div className="mb-3">
             <input 
               type="text" 
-              placeholder="User email"
+              placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)} 
               className="form-control"

@@ -1,41 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
+import configuration from '../configuration.js';
 
-function getMockProjectsData() {
-  const projectNames = [
-    'Apollo',
-    'Beta',
-    'Catalyst',
-    'Delta',
-    'Echo',
-    'Fusion',
-    'Giga',
-    'Helix',
-    'Icarus',
-    'Jupiter',
-  ];
-  const roles = ['Tester', 'Developer'];
-
-  const projects = projectNames.map((name, index) => ({
-    id: index + 1, // Project IDs from 1 to 10
-    name: `Project ${name}`,
-    role: roles[Math.floor(Math.random() * roles.length)],
-  }));
-
-  return projects;
+async function fetchProjectsByUserId(userId) {
+  try {
+    const response = await axios.get(`http://localhost:3000/projects/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch projects:', error);
+    throw new Error('Error fetching projects');
+  }
 }
-
 
 function getMockBugsData(projectIds) {
   const statuses = ['Open', 'Closed', 'In Progress'];
   const importanceLevels = ['Low', 'Medium', 'High'];
 
   let bugs = [];
-  // Generate 30 mock bugs to have a variety of data
   for (let i = 1; i <= 30; i++) {
     const randomProjectId = projectIds[Math.floor(Math.random() * projectIds.length)];
     bugs.push({
-      id: i, // Bug ID
+      id: i,
       projectId: randomProjectId,
       description: `Bug #${i} description`,
       status: statuses[Math.floor(Math.random() * statuses.length)],
@@ -46,26 +33,33 @@ function getMockBugsData(projectIds) {
 }
 
 function MyHome() {
-  // State for projects array
+  const userId = configuration.currentUserId;
+  const navigate = useNavigate();
+
   const [projects, setProjects] = useState([]);
-  
-  // State for all bugs (initially all bugs for all projects)
   const [bugs, setBugs] = useState([]);
-  
-  // State for currently selected project ID to filter bugs
   const [selectedProjectId, setSelectedProjectId] = useState(null);
 
- 
   useEffect(() => {
-    const projectData = getMockProjectsData();
-    setProjects(projectData);
+    if (!userId) {
+      console.error('No userId provided. Redirecting to login.');
+      navigate('/login');
+    }
+  }, [userId, navigate]);
 
-    const projectIds = projectData.map(p => p.id);
-    const bugData = getMockBugsData(projectIds);
-    setBugs(bugData);
-  }, []);
+  useEffect(() => {
+    if (userId) {
+      fetchProjectsByUserId(userId)
+        .then((data) => {
+          setProjects(data);
+          const projectIds = data.map((project) => project.id_project);
+          const bugData = getMockBugsData(projectIds);
+          setBugs(bugData);
+        })
+        .catch((error) => console.error('Failed to fetch projects:', error));
+    }
+  }, []); // Empty dependency array ensures this runs only once
 
-  // Styles for layout and elements
   const containerStyle = {
     display: 'flex',
     flexDirection: 'row',
@@ -96,21 +90,19 @@ function MyHome() {
     border: '1px solid #ccc',
     padding: '8px',
     textAlign: 'left',
-    cursor: 'pointer'
+    cursor: 'pointer',
   };
 
   const selectedRowStyle = {
-    backgroundColor: '#e0f7fa'
+    backgroundColor: '#e0f7fa',
   };
 
-
   const filteredBugs = selectedProjectId
-    ? bugs.filter(bug => bug.projectId === selectedProjectId)
+    ? bugs.filter((bug) => bug.projectId === selectedProjectId)
     : [];
 
   return (
     <div style={containerStyle}>
-      {/* Left Part: My Projects */}
       <div style={halfStyle}>
         <div style={titleStyle}>My Projects</div>
         <table style={tableStyle}>
@@ -118,22 +110,23 @@ function MyHome() {
             <tr>
               <th style={thTdStyle}>Project ID</th>
               <th style={thTdStyle}>Project Name</th>
+              <th style={thTdStyle}>Repository Link</th>
               <th style={thTdStyle}>Role</th>
             </tr>
           </thead>
           <tbody>
             {projects.map((project) => {
-              const isSelected = project.id === selectedProjectId;
+              const isSelected = project.id_project === selectedProjectId;
               return (
                 <tr
-                  key={project.id}
+                  key={project.id_project}
                   style={isSelected ? selectedRowStyle : {}}
-                  // When a project row is clicked, update selectedProjectId
-                  onClick={() => setSelectedProjectId(project.id)}
+                  onClick={() => setSelectedProjectId(project.id_project)}
                 >
-                  <td style={thTdStyle}>{project.id}</td>
-                  <td style={thTdStyle}>{project.name}</td>
-                  <td style={thTdStyle}>{project.role}</td>
+                  <td style={thTdStyle}>{project.id_project}</td>
+                  <td style={thTdStyle}>{project.project_name}</td>
+                  <td style={thTdStyle}><a href={project.repository_link} target="_blank" rel="noopener noreferrer">{project.repository_link}</a></td>
+                  <td style={thTdStyle}>{project.role_name}</td>
                 </tr>
               );
             })}
@@ -141,7 +134,6 @@ function MyHome() {
         </table>
       </div>
 
-      {/* Right Part: Bugs */}
       <div style={halfStyle}>
         <div style={titleStyle}>Bugs</div>
         {selectedProjectId ? (
@@ -166,7 +158,6 @@ function MyHome() {
             </tbody>
           </table>
         ) : (
-          // If no project is selected, prompt the user to select one
           <div>Please select a project from the left panel to see its bugs.</div>
         )}
       </div>

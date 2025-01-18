@@ -1,13 +1,8 @@
-//npm install express
-//npm install cors
-
-
 import express from 'express';
-import cors  from 'cors';
+import cors from 'cors';
 
 import authRouter from './routes/auth.js';
-import projectsRouter from './routes/projectsRouter.js';
-
+import { getProjectsByUserId } from './controllers/projectsController.js';
 
 const app = express();
 
@@ -16,23 +11,26 @@ app.use(express.json());
 
 // Middleware to log all requests
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
+  console.log(`Your request : ${req.method} ${req.url}`);
   next();
 });
 
 // Test route
+//http://localhost:3000/test
 app.get('/test', (req, res) => {
   console.log('Test route hit');
   res.send('Test route works');
 });
 
+// Route to get projects by user ID
+//http://localhost:3000/projects/user/2
+app.get('/projects/user/:id', (req, res) => {
+  console.log('Route hit: /projects/user/:id');
+  getProjectsByUserId(req, res);
+});
+
+// Mount auth routes
 app.use('/auth', authRouter);
-app.use('/projects', projectsRouter);
-
-
-// Additional routes can be mounted here as needed, e.g.:
-// app.use('/bugs', bugsRoutes);
-// app.use('/reports', reportsRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

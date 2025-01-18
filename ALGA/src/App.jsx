@@ -1,3 +1,4 @@
+//App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import NavBar from './components/NavBar';
