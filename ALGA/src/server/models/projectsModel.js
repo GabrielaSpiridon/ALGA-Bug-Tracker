@@ -44,7 +44,7 @@ export async function getUserProjects(userId){
 export async function getUserBugs(userId){
   const conn = await pool.getConnection();
   try{
-    const rows = await conn.query('___________', userId)
+    const rows = await conn.query(`SELECT b.severity_level, b.solve_priority,b.bug_description,b.solution_status FROM bug b, commit c,project_commit pc,project p,project_user pu,user u,user_role ur WHERE u.ID_USER=? AND b.id_commit_report_bug=c.ID_COMMIT AND c.ID_COMMIT=pc.id_commit AND pc.id_project=p.id_project AND p.id_project=pu.id_project AND pu.id_user=u.id_user AND ur.ID_ROLE=pu.ID_ROLE_USER AND UPPER(ur.ROLE_NAME)='DEVELOPER'`, userId)
     return rows;
   } finally {
     conn.release();

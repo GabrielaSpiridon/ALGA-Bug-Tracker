@@ -7,6 +7,7 @@ import cors  from 'cors';
 
 import authRouter from './routes/auth.js';
 import projectsRouter from './routes/projectsRouter.js';
+import bugsRouter from './routes/bugsRouter.js';
 
 
 const app = express();
@@ -28,6 +29,7 @@ app.get('/test', (req, res) => {
 
 app.use('/auth', authRouter);
 app.use('/projects', projectsRouter);
+app.use('/bugs', bugsRouter);
 
 
 // Additional routes can be mounted here as needed, e.g.:
