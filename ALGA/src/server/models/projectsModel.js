@@ -1,6 +1,34 @@
 import pool from '../db/connection.js';
 
 
+
+
+
+
+//creaza un proiect nou
+export async function createNewProject(projectName, perojectRepositoryLink){
+  const conn = await pool.getConnection();
+  try{
+    const rows = await conn.query('INSERT INTO PROJECT (project_name, repository_link) VALUES (? , ?);', [projectName, perojectRepositoryLink])
+    return rows;
+  } finally {
+    conn.release();
+  }
+}
+
+//legatura useri proiect
+export async function insertUsersIntoProjects(projecID, userID, userRoleID){
+  const conn = await pool.getConnection();
+  try{
+    const rows = await conn.query('INSERT INTO PROJECT_USER (id_project, id_user, id_role_user) VALUES (?, ?, ?);',
+      [projecID, userID, userRoleID])
+
+    return rows;
+  } finally {
+    conn.release();
+  }
+}
+
 //Selecteaza toate proiectele unui User 
 export async function getUserProjects(userId){
   const conn = await pool.getConnection();
@@ -36,6 +64,7 @@ export async function getAllProjects() {
     conn.release();
   }
 }
+
 
 
 export async function getProjectById(id) {

@@ -5,9 +5,13 @@ import {
     createProject,
     updateProject,
     deleteProject,
+    insertUsersIntoProjects
   } from '../models/projectsModel.js';
   
-  
+
+
+//_________________________GET PROJECTS from id___________________________________________
+
 export async function getProjectsByUserId(req, res) {
   const { id } = req.params;
 
@@ -29,8 +33,51 @@ export async function getProjectsByUserId(req, res) {
 //TODO GetUserBugs
 
   
-  //________________________________________
+//____________________insert into  user-projects table__________________________________________________________________
+
+    //http://localhost:3000/projects/insertUser
+    //{
+    //   "projectId": 1,
+    //   "users": [
+    //     { "userId": 1, "idRole": 1 },
+    //     { "userId": 2, "idRole": 2 }
+    //   ]
+    // }
+
+  export async function insertUsersProjects(req, res) {
+    const { projectId, users } = req.body;
+
+    if (!projectId || !Array.isArray(users) || users.length === 0) {
+      return res.status(400).send('Missing parameters or invalid user list');
+    }
   
+    try {
+      const insertResults = [];
+      for (const user of users) {
+        const { userId, idRole } = user;
+        if (!userId || !idRole) {
+          return res.status(400).send('Each user must have userId and idRole');
+        }
+        
+        const insertId = await insertUsersIntoProjects(projectId, userId, idRole);
+        insertResults.push({
+          id: insertId.toString(),
+          projectId: projectId.toString(),
+          userId: userId.toString(),
+          idRole: idRole.toString(),
+        });
+      }
+  
+      res.json({ success: true, users: insertResults });
+    } catch (error) {
+      console.error('Error creating users in project:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  }
+
+ 
+  //____________________get all projects__________________________________________________________________
+
   export async function getProjects(req, res) {
     try {
       const projects = await getAllProjects();
@@ -40,6 +87,8 @@ export async function getProjectsByUserId(req, res) {
       res.status(500).send('Internal Server Error');
     }
   }
+
+
   
   export async function getSingleProject(req, res) {
     const { id } = req.params;
@@ -72,6 +121,9 @@ export async function getProjectsByUserId(req, res) {
       console.error('Error creating project:', error);
       res.status(500).send('Internal Server Error');
     }
+
+    //TODO
+    //populateProjectMembers
   }
   
   export async function updateExistingProject(req, res) {
