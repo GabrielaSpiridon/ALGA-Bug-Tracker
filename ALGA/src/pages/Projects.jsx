@@ -3,14 +3,16 @@ import axios from 'axios';
 
 import configuration from '../configuration';
 
-let  tester = 1;
-let  developer = 2;
+let tester = 1;
+let developer = 2;
 function Projects() {
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [projectGitHubUrl, setProjectGitHubUrl] = useState('');
   const [userProjects, setUserProjects] = useState([]); // User's projects
   const [allProjects, setAllProjects] = useState([]); // All projects
+  const [allUsers, setAllUsers] = useState([]); // All users
+  const [selectedUsers, setSelectedUsers] = useState([]); // Selected users for new project
   const [selectedProject, setSelectedProject] = useState(null); // Selected project details
   const [showEnrollButtons, setShowEnrollButtons] = useState(false); // Visibility of enroll buttons
 
@@ -45,9 +47,22 @@ function Projects() {
       });
   }
 
+  // Fetch all users
+  function fetchAllUsers() {
+    axios
+      .get('http://localhost:3000/projects/getAllUsers')
+      .then((response) => {
+        setAllUsers(response.data);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch all users:', error);
+      });
+  }
+
   useEffect(() => {
     fetchAllProjects();
     fetchUserProjects();
+    fetchAllUsers();
   }, []);
 
   // Handle project click
@@ -56,25 +71,24 @@ function Projects() {
     setShowEnrollButtons(isFromAllProjects);
   };
 
-  
-  //Add a new entery in the project-user table
+  //Add a new entry in the project-user table
   function handleAddProjectUser(roleId) {
     if (!selectedProject) {
       alert('No project selected!');
       return;
     }
-  
+
     const requestBody = {
       userId: currentUserId,
       projectId: selectedProject.id_project, 
-      roleId: roleId, // Pass the role ID (0 for Tester, 1 for Dev)
+      roleId: roleId, // Pass the role ID (Tester or Dev)
     };
-    
+
     axios
       .post('http://localhost:3000/projects/insertUserIntoProject', requestBody)
       .then((response) => {
         if (response.status === 200) {
-          alert(`Successfully enrolled as ${roleId == tester ? 'Tester' : 'Developer'}!`);
+          alert(`Successfully enrolled as ${roleId === tester ? 'Tester' : 'Developer'}!`);
           fetchUserProjects(); // Refresh the user's projects
         }
       })
@@ -83,7 +97,6 @@ function Projects() {
         alert('Error enrolling user in project');
       });
   }
-  
 
   // Create a new project
   function handleCreateProject() {
@@ -92,17 +105,45 @@ function Projects() {
       return;
     }
 
+    if (selectedUsers.length === 0) {
+      alert('Please select at least one user for the project.');
+      return;
+    }
+
     const requestBody = {
       project_name: projectName,
       repository_link: projectGitHubUrl,
+      users: selectedUsers, // Selected users
     };
+
     axios
-      .post('http://localhost:3000/projects/create',requestBody)
+      .post('http://localhost:3000/projects/create', requestBody)
       .then((response) => {
         if (response.status === 200) {
           alert('Project created successfully!');
+
+          const projectIdNumber = Number(response.data.insertId);
+          console.log('Project ID as Number:', projectIdNumber);
+
+          // Add selected users to the project-user table
+          selectedUsers.forEach((userId) => {
+            axios
+              .post('http://localhost:3000/projects/insertUserIntoProject', {
+                userId: userId,
+                projectId: projectIdNumber, // Assuming the backend returns the new project ID
+                roleId: developer, // Default role for all users can be customized
+              })
+              .then(() => {
+                console.log(`User ${userId} added to project.`);
+              })
+              .catch((error) => {
+                console.error(`Failed to add user ${userId} to project:`, error);
+              });
+          });
+
           setProjectName('');
           setProjectGitHubUrl('');
+          setSelectedUsers([]); // Clear selected users
           setIsAddingProject(false);
           fetchAllProjects();
         }
@@ -127,43 +168,76 @@ function Projects() {
             border: '1px solid #ccc',
             padding: '20px',
             marginBottom: '20px',
+            display: 'flex',
+            gap: '20px',
           }}
         >
-          <h3>Add New Project</h3>
-          <div style={{ marginBottom: '10px' }}>
-            <label>
-              Project Name:
-              <input
-                type="text"
-                placeholder="Enter project name"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                style={{ marginLeft: '10px' }}
-              />
-            </label>
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label>
-              GitHub URL:
-              <input
-                type="text"
-                placeholder="Enter GitHub URL"
-                value={projectGitHubUrl}
-                onChange={(e) => setProjectGitHubUrl(e.target.value)}
-                style={{ marginLeft: '10px' }}
-              />
-            </label>
+          <div style={{ flex: 1, overflowY: 'auto', maxHeight: '400px', border: '1px solid #ccc', padding: '10px' }}>
+            <h3>Select Users</h3>
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              {allUsers.length > 0 ? (
+                allUsers.map((user) => (
+                  <li key={user.id_user} style={{ marginBottom: '10px' }}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value={user.id_user}
+                        onChange={(e) => {
+                          const userId = parseInt(e.target.value, 10);
+                          setSelectedUsers((prev) =>
+                            e.target.checked
+                              ? [...prev, userId] // Add user ID
+                              : prev.filter((id) => id !== userId) // Remove user ID
+                          );
+                        }}
+                      />{' '}
+                      {user.user_name}
+                    </label>
+                  </li>
+                ))
+              ) : (
+                <p>No users found.</p>
+              )}
+            </ul>
           </div>
 
-          <button style={{ marginTop: '10px' }} onClick={handleCreateProject}>
-            Submit
-          </button>
-          <button
-            style={{ marginTop: '10px', marginLeft: '10px' }}
-            onClick={toggleAddProject}
-          >
-            Cancel
-          </button>
+          <div style={{ flex: 2 }}>
+            <h3>Add New Project</h3>
+            <div style={{ marginBottom: '10px' }}>
+              <label>
+                Project Name:
+                <input
+                  type="text"
+                  placeholder="Enter project name"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  style={{ marginLeft: '10px' }}
+                />
+              </label>
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <label>
+                GitHub URL:
+                <input
+                  type="text"
+                  placeholder="Enter GitHub URL"
+                  value={projectGitHubUrl}
+                  onChange={(e) => setProjectGitHubUrl(e.target.value)}
+                  style={{ marginLeft: '10px' }}
+                />
+              </label>
+            </div>
+
+            <button style={{ marginTop: '10px' }} onClick={handleCreateProject}>
+              Submit
+            </button>
+            <button
+              style={{ marginTop: '10px', marginLeft: '10px' }}
+              onClick={toggleAddProject}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
 
@@ -203,7 +277,7 @@ function Projects() {
 
         {/* User Projects */}
         <div style={{ flex: 1, border: '1px solid #ccc', padding: '20px', overflowY: 'auto', maxHeight: '400px' }}>
-          <h3>User Projects</h3>
+          <h3>My Projects</h3>
           <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
             <thead>
               <tr>

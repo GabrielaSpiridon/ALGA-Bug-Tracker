@@ -1,12 +1,26 @@
 import pool from '../db/connection.js';
 
 
+//selecteaza toti useri
+export async function getAllUsers() {
+  const conn = await pool.getConnection();
+  try{
+    const rows = await conn.query('SELECT * FROM USER;')
+    return rows;
+  } finally {
+    conn.release();
+  }
+}
+
 //creaza un proiect nou
 export async function createNewProject(projectName, perojectRepositoryLink){
   const conn = await pool.getConnection();
   try{
-    const rows = await conn.query('INSERT INTO PROJECT (project_name, repository_link) VALUES (? , ?);', [projectName, perojectRepositoryLink])
-    return rows;
+    const result = await conn.query('INSERT INTO PROJECT (project_name, repository_link) VALUES (? , ?);', [projectName, perojectRepositoryLink])
+    // Safely convert BigInt to Number
+    const insertId = typeof result.insertId === 'bigint' ? Number(result.insertId) : result.insertId;
+
+    return insertId; // Returns the project ID as a Number
   } finally {
     conn.release();
   }

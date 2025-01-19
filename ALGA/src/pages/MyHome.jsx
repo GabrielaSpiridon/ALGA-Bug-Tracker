@@ -17,16 +17,12 @@ async function fetchProjectsByUserId(userId) {
 
 async function fetchBugsByProjectId(projectId) {
   try {
-    const response = await axios.get(`http://localhost:3000/bugs/getBugsByProject/${projectId}`);
+    const response = await axios.get(`http://localhost:3000/bugs/getProjectBugsById/${projectId}`);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch bugs:', error);
     throw new Error('Error fetching bugs');
   }
-}
-
-function mockFunction(userId, projectId) {
-  console.log(`Mock function called with userId: ${userId} and projectId: ${projectId}`);
 }
 
 function MyHome() {
@@ -62,7 +58,10 @@ function MyHome() {
   useEffect(() => {
     if (selectedProjectId) {
       fetchBugsByProjectId(selectedProjectId)
-        .then((data) => setBugs(data))
+        .then((data) => {
+          setBugs(data);
+          setSelectedBug(null); // Deselect bug when project changes
+        })
         .catch((error) => console.error('Failed to fetch bugs:', error));
     }
   }, [selectedProjectId]);
@@ -104,9 +103,7 @@ function MyHome() {
     backgroundColor: '#e0f7fa',
   };
 
-  const filteredBugs = selectedProjectId
-    ? bugs.filter((bug) => bug.projectId === selectedProjectId)
-    : [];
+  const filteredBugs = bugs;
 
   const selectedProjectName = projects.find((project) => project.id_project === selectedProjectId)?.project_name || '';
 
@@ -143,7 +140,7 @@ function MyHome() {
         </table>
         <button
           style={{ marginTop: '10px' }}
-          onClick={() => selectedProjectId && mockFunction(userId, selectedProjectId)}
+          onClick={() => selectedProjectId && fetchBugsByProjectId(selectedProjectId)}
           disabled={!selectedProjectId}
         >
           Report New Bug
@@ -160,27 +157,31 @@ function MyHome() {
                   <th style={thTdStyle}>ID</th>
                   <th style={thTdStyle}>Description</th>
                   <th style={thTdStyle}>Status</th>
-                  <th style={thTdStyle}>Importance</th>
+                  <th style={thTdStyle}>Priority</th>
+                  <th style={thTdStyle}>Severity</th>
+                  <th style={thTdStyle}>Solver</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredBugs.map((bug) => (
                   <tr
-                    key={bug.id}
-                    style={selectedBug?.id === bug.id ? selectedRowStyle : {}}
+                    key={bug.id_bug}
+                    style={selectedBug?.id_bug === bug.id_bug ? selectedRowStyle : {}}
                     onClick={() => setSelectedBug(bug)}
                   >
-                    <td style={thTdStyle}>{bug.id}</td>
-                    <td style={thTdStyle}>{bug.description}</td>
-                    <td style={thTdStyle}>{bug.status}</td>
-                    <td style={thTdStyle}>{bug.importance}</td>
+                    <td style={thTdStyle}>{bug.id_bug}</td>
+                    <td style={thTdStyle}>{bug.bug_description}</td>
+                    <td style={thTdStyle}>{bug.solution_status}</td>
+                    <td style={thTdStyle}>{bug.solve_priority}</td>
+                    <td style={thTdStyle}>{bug.severity_level}</td>
+                    <td style={thTdStyle}>{bug.user_name}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <button
               style={{ marginTop: '10px' }}
-              onClick={() => selectedBug && console.log(`Resolve bug ${selectedBug.id}`)}
+              onClick={() => selectedBug && console.log(`Resolve bug ${selectedBug.id_bug}`)}
               disabled={!selectedBug}
             >
               Resolve Bug

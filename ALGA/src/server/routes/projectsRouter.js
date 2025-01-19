@@ -3,11 +3,17 @@ import {
   createNewProjectCtrl,
   insertUsersIntoProjectCtrl,
   getUserProjectsCtrl,
-  getAllProjectsCtrl
+  getAllProjectsCtrl,
+  getAllUsersCtrl
 } from '../controllers/projectsController.js';
 
 const router = Router();
 
+//get all the users
+router.get('/getAllUsers', (req, res, next) => {
+  console.log('Route hit via router: /getAllUsers');
+  next();
+}, getAllUsersCtrl);
 
 // Create a new project
 //http://localhost:3000/projects/create

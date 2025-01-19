@@ -2,9 +2,29 @@ import {
     createNewProject,
     insertUsersIntoProject,
     getUserProjects,
-    getAllProjects
+    getAllProjects,
+    getAllUsers
   } from '../models/projectsModel.js';
   
+
+//__________________SELECTEAZA TOTI USERII_____________________________________________
+  export async function  getAllUsersCtrl(req, res) {
+    try {
+      // Call the model function to get the projects
+      const projects = await getAllUsers();
+  
+      if (!projects || projects.length === 0) {
+        return res.status(404).json({ message: 'No users founf' });
+      }
+  
+      res.json(projects);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  }
+
+
 
 
 //__________________ CREAZA UN PROIECT NOU______________________________________________
@@ -18,7 +38,7 @@ import {
     try {
       const insertId = await createNewProject(project_name, repository_link);
       if (insertId) {
-        res.json({ id: Number(insertId), project_name, repository_link });
+        res.json({  insertId: insertId.toString(), project_name, repository_link });
       } else {
         res.status(500).send('Unable to create project');
       }
