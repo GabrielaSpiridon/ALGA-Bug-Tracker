@@ -49,7 +49,10 @@ router.get('/getSingleBug/:id', getSingleBug);
 
 // Route to create a new bug
 //http://localhost:3000/bugs/createNewBug
-router.post('/create', createNewBug);
+router.post('/createNewBug', (req, res, next) => {
+  console.log('Route hit via router: createNewBug');
+  next();
+}, createNewBug);
 
 // Route to update an existing bug by ID
 //http://localhost:3000/bugs/updateExistingBug/9
@@ -64,11 +67,12 @@ router.delete('/removeBug/:id', removeBug);
 router.get('/verifySolverAssignedCtrl/:id', verifySolverAssignedCtrl);
 
 // Route to update the solver id for a bug
-//http://localhost:3000/bugs/updateStatusAssignedBugCtrl/
+//http://localhost:3000/bugs/updateStatusAssignedBugCtrl
 router.put('/updateStatusAssignedBugCtrl', updateStatusAssignedBugCtrl);
 
 // Route to update the status bug - solved
-router.put('/updateStatusBugCtrl/:id', updateStatusBugCtrl);
+//http://localhost:3000/bugs/updateStatusBugCtrl
+router.post('/updateStatusBugCtrl', updateStatusBugCtrl);
 
 
 // Ensure there is a default export

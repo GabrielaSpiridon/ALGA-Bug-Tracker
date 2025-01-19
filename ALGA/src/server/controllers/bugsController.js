@@ -77,30 +77,56 @@ import {
   
   // Create a new bug
   export async function createNewBug(req, res) {
-    const { severity_level, solve_priority, bug_description, solution_status } = req.body;
+    const { 
+      id_project, 
+      commit_link, 
+      severity_level, 
+      solve_priority, 
+      bug_description, 
+      solution_status, 
+      id_user_reporter 
+    } = req.body;
   
-    if (!severity_level || !solve_priority || !bug_description || !solution_status) {
-      return res.status(400).send('Missing parameters');
+    // Validare completă a parametrilor
+    if (!id_project || !commit_link || !severity_level || !solve_priority || !bug_description || !solution_status || !id_user_reporter) {
+      return res.status(400).json({ error: 'Missing required parameters' });
     }
   
     try {
-      const insertId = await createBug(severity_level, solve_priority, bug_description, solution_status);
+      // Creare bug folosind modelul
+      const insertId = await createBug(
+        id_project,
+        commit_link,
+        severity_level,
+        solve_priority,
+        bug_description,
+        solution_status,
+        null, // id_commit_report_bug nu este necesar aici
+        id_user_reporter
+      );
+  
       if (insertId) {
-        res.json({
+        // Răspuns de succes
+        res.status(201).json({
           id: Number(insertId),
+          id_project,
+          commit_link,
           severity_level,
           solve_priority,
           bug_description,
           solution_status,
+          id_user_reporter,
         });
       } else {
-        res.status(500).send('Unable to create bug');
+        // Eroare dacă bug-ul nu a fost creat
+        res.status(500).json({ error: 'Unable to create bug' });
       }
     } catch (error) {
-      console.error('Error creating bug:', error);
-      res.status(500).send('Internal Server Error');
+      // Mesaj de eroare detaliat pentru debugging
+      console.error('Error creating bug:', error.message);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
-  }
+  }  
   
   // Update an existing bug
   export async function updateExistingBug(req, res) {
@@ -201,23 +227,25 @@ import {
 
   // Update the status bug - solved
   export async function updateStatusBugCtrl(req, res) {
-    const { id } = req.params;
-    const {solution_status,id_commit_resolve_bug } = req.body;
+    const {id_bug,id_project,solution_status,link_commit_resolve_bug } = req.body;
   
-    if (!solution_status || !id_commit_resolve_bug) {
-      return res.status(400).send('Missing parameters');
-    }
+    if (!id_bug || !id_project || !solution_status || !link_commit_resolve_bug) {
+      return res.status(400).send('Missing required parameters');
+    }    
   
     try {
       const success = await updateStatusBug(
+        id_bug,
+        id_project,
         solution_status,
-        id_commit_resolve_bug
+        link_commit_resolve_bug
       );
       if (success) {
         res.json({
-          id,
-          solution_status,
-          id_commit_resolve_bug,
+           id_bug,
+        id_project,
+        solution_status,
+        link_commit_resolve_bug
         });
       } else {
         res.status(404).send('Bug not found or not updated');
