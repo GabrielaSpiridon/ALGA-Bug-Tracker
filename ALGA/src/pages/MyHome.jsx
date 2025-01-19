@@ -1,3 +1,4 @@
+//MyHome.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -6,7 +7,7 @@ import configuration from '../configuration.js';
 
 async function fetchProjectsByUserId(userId) {
   try {
-    const response = await axios.get(`http://localhost:3000/projects/user/${userId}`);
+    const response = await axios.get(`http://localhost:3000/projects/getProjectsByUser/${userId}`);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch projects:', error);
@@ -14,36 +15,37 @@ async function fetchProjectsByUserId(userId) {
   }
 }
 
-function getMockBugsData(projectIds) {
-  const statuses = ['Open', 'Closed', 'In Progress'];
-  const importanceLevels = ['Low', 'Medium', 'High'];
-
-  let bugs = [];
-  for (let i = 1; i <= 30; i++) {
-    const randomProjectId = projectIds[Math.floor(Math.random() * projectIds.length)];
-    bugs.push({
-      id: i,
-      projectId: randomProjectId,
-      description: `Bug #${i} description`,
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      importance: importanceLevels[Math.floor(Math.random() * importanceLevels.length)],
-    });
+async function fetchBugsByProjectId(projectId) {
+  try {
+    const response = await axios.get(`http://localhost:3000/bugs/getBugsByProject/${projectId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch bugs:', error);
+    throw new Error('Error fetching bugs');
   }
-  return bugs;
+}
+
+function mockFunction(userId, projectId) {
+  console.log(`Mock function called with userId: ${userId} and projectId: ${projectId}`);
 }
 
 function MyHome() {
   const userId = configuration.currentUserId;
+  console.log('Current userId:', userId);
+
   const navigate = useNavigate();
 
   const [projects, setProjects] = useState([]);
   const [bugs, setBugs] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [selectedBug, setSelectedBug] = useState(null);
 
   useEffect(() => {
-    if (!userId) {
+    if (!userId || userId === 0) {
       console.error('No userId provided. Redirecting to login.');
-      navigate('/login');
+      if (window.location.pathname !== '/login') {
+        navigate('/login', { replace: true });
+      }
     }
   }, [userId, navigate]);
 
@@ -52,13 +54,18 @@ function MyHome() {
       fetchProjectsByUserId(userId)
         .then((data) => {
           setProjects(data);
-          const projectIds = data.map((project) => project.id_project);
-          const bugData = getMockBugsData(projectIds);
-          setBugs(bugData);
         })
         .catch((error) => console.error('Failed to fetch projects:', error));
     }
-  }, []); // Empty dependency array ensures this runs only once
+  }, [userId]);
+
+  useEffect(() => {
+    if (selectedProjectId) {
+      fetchBugsByProjectId(selectedProjectId)
+        .then((data) => setBugs(data))
+        .catch((error) => console.error('Failed to fetch bugs:', error));
+    }
+  }, [selectedProjectId]);
 
   const containerStyle = {
     display: 'flex',
@@ -101,6 +108,8 @@ function MyHome() {
     ? bugs.filter((bug) => bug.projectId === selectedProjectId)
     : [];
 
+  const selectedProjectName = projects.find((project) => project.id_project === selectedProjectId)?.project_name || '';
+
   return (
     <div style={containerStyle}>
       <div style={halfStyle}>
@@ -132,31 +141,51 @@ function MyHome() {
             })}
           </tbody>
         </table>
+        <button
+          style={{ marginTop: '10px' }}
+          onClick={() => selectedProjectId && mockFunction(userId, selectedProjectId)}
+          disabled={!selectedProjectId}
+        >
+          Report New Bug
+        </button>
       </div>
 
       <div style={halfStyle}>
-        <div style={titleStyle}>Bugs</div>
+        <div style={titleStyle}>Reported bugs for project {selectedProjectName}</div>
         {selectedProjectId ? (
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={thTdStyle}>ID</th>
-                <th style={thTdStyle}>Description</th>
-                <th style={thTdStyle}>Status</th>
-                <th style={thTdStyle}>Importance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredBugs.map((bug) => (
-                <tr key={bug.id}>
-                  <td style={thTdStyle}>{bug.id}</td>
-                  <td style={thTdStyle}>{bug.description}</td>
-                  <td style={thTdStyle}>{bug.status}</td>
-                  <td style={thTdStyle}>{bug.importance}</td>
+          <div>
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thTdStyle}>ID</th>
+                  <th style={thTdStyle}>Description</th>
+                  <th style={thTdStyle}>Status</th>
+                  <th style={thTdStyle}>Importance</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredBugs.map((bug) => (
+                  <tr
+                    key={bug.id}
+                    style={selectedBug?.id === bug.id ? selectedRowStyle : {}}
+                    onClick={() => setSelectedBug(bug)}
+                  >
+                    <td style={thTdStyle}>{bug.id}</td>
+                    <td style={thTdStyle}>{bug.description}</td>
+                    <td style={thTdStyle}>{bug.status}</td>
+                    <td style={thTdStyle}>{bug.importance}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button
+              style={{ marginTop: '10px' }}
+              onClick={() => selectedBug && console.log(`Resolve bug ${selectedBug.id}`)}
+              disabled={!selectedBug}
+            >
+              Resolve Bug
+            </button>
+          </div>
         ) : (
           <div>Please select a project from the left panel to see its bugs.</div>
         )}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="#FFFFFF" />
+  <circle cx="512" cy="512" r="300" fill="#32CD32" />
+  <path d="M512 212 C 412 212, 312 312, 312 412 S 412 612, 512 612 S 712 512, 712 412 S 612 212, 512 212 Z" fill="#228B22" />
+  <text x="50%" y="85%" text-anchor="middle" fill="#000000" font-size="80" font-family="Arial, sans-serif">
+    Alga
+  </text>
+</svg>

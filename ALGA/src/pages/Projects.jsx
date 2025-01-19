@@ -3,57 +3,115 @@ import axios from 'axios';
 
 import configuration from '../configuration';
 
+let  tester = 1;
+let  developer = 2;
 function Projects() {
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [projectName, setProjectName] = useState('');
-  const [projectMembers, setProjectMembers] = useState('');
-  const [projects, setProjects] = useState([]);
+  const [projectGitHubUrl, setProjectGitHubUrl] = useState('');
+  const [userProjects, setUserProjects] = useState([]); // User's projects
+  const [allProjects, setAllProjects] = useState([]); // All projects
+  const [selectedProject, setSelectedProject] = useState(null); // Selected project details
+  const [showEnrollButtons, setShowEnrollButtons] = useState(false); // Visibility of enroll buttons
+
   const currentUserId = configuration.currentUserId; // Replace with your actual method to get the current user ID
 
-  // Toggle add project form visibility
+  // Toggle visibility of the project creation form
   const toggleAddProject = () => {
     setIsAddingProject(!isAddingProject);
   };
 
-  // Fetch projects for the current user
-  useEffect(() => {
-    async function fetchUserProjects() {
-      try {
-        const response = await axios.get(`http://localhost:3000/projects/getProjectsByUser/${currentUserId}`);
-        setProjects(response.data);
-      } catch (error) {
+  // Fetch all projects
+  function fetchAllProjects() {
+    axios
+      .get('http://localhost:3000/projects/getAllProjects')
+      .then((response) => {
+        setAllProjects(response.data);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch all projects:', error);
+      });
+  }
+
+  // Fetch projects where the current user is enrolled
+  function fetchUserProjects() {
+    axios
+      .get(`http://localhost:3000/projects/getProjectsByUser/${currentUserId}`)
+      .then((response) => {
+        setUserProjects(response.data);
+      })
+      .catch((error) => {
         console.error('Failed to fetch user projects:', error);
-      }
-    }
+      });
+  }
 
+  useEffect(() => {
+    fetchAllProjects();
     fetchUserProjects();
-  }, [currentUserId]);
+  }, []);
 
-  // Create new project
-  const handleCreateProject = async () => {
-    if (!projectName) {
-      alert('Project name is required');
+  // Handle project click
+  const handleProjectClick = (project, isFromAllProjects) => {
+    setSelectedProject(project);
+    setShowEnrollButtons(isFromAllProjects);
+  };
+
+  
+  //Add a new entery in the project-user table
+  function handleAddProjectUser(roleId) {
+    if (!selectedProject) {
+      alert('No project selected!');
+      return;
+    }
+  
+    const requestBody = {
+      userId: currentUserId,
+      projectId: selectedProject.id_project, 
+      roleId: roleId, // Pass the role ID (0 for Tester, 1 for Dev)
+    };
+    
+    axios
+      .post('http://localhost:3000/projects/insertUserIntoProject', requestBody)
+      .then((response) => {
+        if (response.status === 200) {
+          alert(`Successfully enrolled as ${roleId == tester ? 'Tester' : 'Developer'}!`);
+          fetchUserProjects(); // Refresh the user's projects
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to enroll user in project:', error);
+        alert('Error enrolling user in project');
+      });
+  }
+  
+
+  // Create a new project
+  function handleCreateProject() {
+    if (!projectName || !projectGitHubUrl) {
+      alert('Both Project Name and GitHub URL are required');
       return;
     }
 
-    try {
-      const response = await axios.post('http://localhost:3000/create', {
-        projectName,
-        members: projectMembers.split(',').map((id) => id.trim()), // Split and trim member IDs
+    const requestBody = {
+      project_name: projectName,
+      repository_link: projectGitHubUrl,
+    };
+    axios
+      .post('http://localhost:3000/projects/create',requestBody)
+      .then((response) => {
+        if (response.status === 200) {
+          alert('Project created successfully!');
+          setProjectName('');
+          setProjectGitHubUrl('');
+          setIsAddingProject(false);
+          fetchAllProjects();
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to create project:', error);
+        alert('Error creating project');
       });
-
-      if (response.status === 200) {
-        alert('Project created successfully!');
-        setProjectName('');
-        setProjectMembers('');
-        setIsAddingProject(false);
-        setProjects((prevProjects) => [...prevProjects, response.data]); // Add the new project to the table
-      }
-    } catch (error) {
-      console.error('Failed to create project:', error);
-      alert('Error creating project');
-    }
-  };
+  }
 
   return (
     <div style={{ padding: '20px' }}>
@@ -86,12 +144,12 @@ function Projects() {
           </div>
           <div style={{ marginBottom: '10px' }}>
             <label>
-              Project Members:
+              GitHub URL:
               <input
                 type="text"
-                placeholder="Enter member IDs (comma-separated)"
-                value={projectMembers}
-                onChange={(e) => setProjectMembers(e.target.value)}
+                placeholder="Enter GitHub URL"
+                value={projectGitHubUrl}
+                onChange={(e) => setProjectGitHubUrl(e.target.value)}
                 style={{ marginLeft: '10px' }}
               />
             </label>
@@ -109,45 +167,32 @@ function Projects() {
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        {/* Table 1 */}
-        <div style={{ flex: '1', marginRight: '10px' }}>
-          <h3>Table 1: Projects</h3>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              border: '1px solid #ccc',
-            }}
-          >
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
+        {/* All Projects */}
+        <div style={{ flex: 1, border: '1px solid #ccc', padding: '20px', overflowY: 'auto', maxHeight: '400px' }}>
+          <h3>All Projects</h3>
+          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
             <thead>
               <tr>
-                <th style={{ border: '1px solid #ccc', padding: '8px' }}>
-                  Project ID
-                </th>
-                <th style={{ border: '1px solid #ccc', padding: '8px' }}>
-                  Project Name
-                </th>
+                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Project Name</th>
+                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Git URL</th>
               </tr>
             </thead>
             <tbody>
-              {projects.length > 0 ? (
-                projects.map((project) => (
-                  <tr key={project.id_project}>
-                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                      {project.id_project}
-                    </td>
-                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                      {project.project_name}
-                    </td>
+              {allProjects.length > 0 ? (
+                allProjects.map((project) => (
+                  <tr
+                    key={project.id_project}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleProjectClick(project, true)}
+                  >
+                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.project_name}</td>
+                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.repository_link}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="2"
-                    style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}
-                  >
+                  <td colSpan="2" style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
                     No projects found.
                   </td>
                 </tr>
@@ -156,41 +201,65 @@ function Projects() {
           </table>
         </div>
 
-        {/* Table 2 */}
-        <div style={{ flex: '1', marginLeft: '10px' }}>
-          <h3>Table 2: Members</h3>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              border: '1px solid #ccc',
-            }}
-          >
+        {/* User Projects */}
+        <div style={{ flex: 1, border: '1px solid #ccc', padding: '20px', overflowY: 'auto', maxHeight: '400px' }}>
+          <h3>User Projects</h3>
+          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
             <thead>
               <tr>
-                <th style={{ border: '1px solid #ccc', padding: '8px' }}>
-                  Member ID
-                </th>
-                <th style={{ border: '1px solid #ccc', padding: '8px' }}>
-                  Member Name
-                </th>
+                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Project Name</th>
+                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Git URL</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>101</td>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                  John Doe
-                </td>
-              </tr>
-              <tr>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>102</td>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                  Jane Smith
-                </td>
-              </tr>
+              {userProjects.length > 0 ? (
+                userProjects.map((project) => (
+                  <tr
+                    key={project.id_project}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleProjectClick(project, false)}
+                  >
+                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.project_name}</td>
+                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.repository_link}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="2" style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
+                    No projects found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
+        </div>
+
+        {/* Project Details */}
+        <div style={{ flex: 1, border: '1px solid #ccc', padding: '20px' }}>
+          <h3>Project Details</h3>
+          {selectedProject ? (
+            <div>
+              <p><strong>Project Name:</strong> {selectedProject.project_name}</p>
+              <p><strong>GitHub URL:</strong> <a href={selectedProject.repository_link} target="_blank" rel="noopener noreferrer">{selectedProject.repository_link}</a></p>
+              {showEnrollButtons && (
+                <div>
+                  <button 
+                       onClick={() => handleAddProjectUser(tester)}
+                      style={{ marginRight: '10px' }}>
+                      Enroll as Tester
+                  </button>
+                  
+                  <button 
+                       onClick={() => handleAddProjectUser(developer)}
+                      style={{ marginRight: '10px' }}>
+                      Enroll as Dev
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p>Select a project to see its details.</p>
+          )}
         </div>
       </div>
     </div>

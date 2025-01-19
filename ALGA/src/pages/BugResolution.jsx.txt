@@ -1,0 +1,75 @@
+// BugResolution.jsx
+import React, { useState } from 'react';
+import axios from 'axios';
+
+
+function BugResolution({ bugId, onUpdate }) {
+  const [resolutionStatus, setResolutionStatus] = useState('');
+  const [commitLink, setCommitLink] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!resolutionStatus || !commitLink) {
+      alert('Both resolution status and commit link are required!');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await axios.post('http://localhost:3000/bugs/resolve', {
+        bugId,
+        resolutionStatus,
+        commitLink,
+      });
+
+      if (response.status === 200) {
+        alert('Bug resolution status updated successfully!');
+        onUpdate(); // Trigger any parent update function to refresh the UI
+      } else {
+        alert('Failed to update bug resolution status.');
+      }
+    } catch (error) {
+      console.error('Error submitting resolution status:', error);
+      alert('Error updating bug resolution status.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div>
+      <h3>Update Bug Resolution</h3>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>
+            Resolution Status:
+            <input
+              type="text"
+              placeholder="e.g., Resolved"
+              value={resolutionStatus}
+              onChange={(e) => setResolutionStatus(e.target.value)}
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Commit Link:
+            <input
+              type="url"
+              placeholder="Enter commit link"
+              value={commitLink}
+              onChange={(e) => setCommitLink(e.target.value)}
+            />
+          </label>
+        </div>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default BugResolution;

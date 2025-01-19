@@ -1,18 +1,72 @@
 import {
+    createNewProject,
+    insertUsersIntoProject,
     getUserProjects,
-    getAllProjects,
-    getProjectById,
-    createProject,
-    updateProject,
-    deleteProject,
-    insertUsersIntoProjects
+    getAllProjects
   } from '../models/projectsModel.js';
   
 
 
-//_________________________GET PROJECTS from id___________________________________________
+//__________________ CREAZA UN PROIECT NOU______________________________________________
 
-export async function getProjectsByUserId(req, res) {
+  export async function createNewProjectCtrl(req, res) {
+    const { project_name, repository_link } = req.body;
+    if (!project_name || !repository_link) {
+      return res.status(400).send('Missing parameters');
+    }
+  
+    try {
+      const insertId = await createNewProject(project_name, repository_link);
+      if (insertId) {
+        res.json({ id: Number(insertId), project_name, repository_link });
+      } else {
+        res.status(500).send('Unable to create project');
+      }
+    } catch (error) {
+      console.error('Error creating project:', error);
+      res.status(500).send('Internal Server Error');
+    }
+
+  }
+
+
+
+//____________________ INSEREAZA IN TABELE UDER_PROJECTS __________________________________________________________________
+
+    //http://localhost:3000/projects/insertUser
+    //{
+    //   "projectId": 1,
+    //    "userId": 1,
+    //    "idRole": 1 },
+  
+    // }
+
+    export async function insertUsersIntoProjectCtrl(req, res) {
+      const { projectId, userId, roleId } = req.body;
+  
+      console.info('insertUsersIntoProjectCtrl ', projectId, userId, roleId);
+
+      if (!projectId || !userId ) {
+        return res.status(400).send('Missing parameters.');
+      }
+    
+      try {
+        const insertId = await insertUsersIntoProject(projectId, userId, roleId);    
+         res.json({ success: true, insertId:Number(insertId)});
+      } catch (error) {
+        console.error('Error creating user in project:', error);
+        res.status(500).send('Internal Server Error');
+      }
+    }
+  
+
+
+//_________________________GET PROIECTELE USERULUI LOGAT___________________________________________
+    //router.get('/user/:id', getProjectByUserId);
+    //http://localhost:3000/projects/getProjectsByUser/1
+
+
+export async function getUserProjectsCtrl(req, res) {
   const { id } = req.params;
 
   try {
@@ -30,139 +84,23 @@ export async function getProjectsByUserId(req, res) {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 }
-//TODO GetUserBugs
 
-  
-//____________________insert into  user-projects table__________________________________________________________________
-
-    //http://localhost:3000/projects/insertUser
-    //{
-    //   "projectId": 1,
-    //   "users": [
-    //     { "userId": 1, "idRole": 1 },
-    //     { "userId": 2, "idRole": 2 }
-    //   ]
-    // }
-
-  export async function insertUsersProjects(req, res) {
-    const { projectId, users } = req.body;
-
-    if (!projectId || !Array.isArray(users) || users.length === 0) {
-      return res.status(400).send('Missing parameters or invalid user list');
-    }
-  
-    try {
-      const insertResults = [];
-      for (const user of users) {
-        const { userId, idRole } = user;
-        if (!userId || !idRole) {
-          return res.status(400).send('Each user must have userId and idRole');
+//_________________________GET TOATE PROIECTELE___________________________________________
+    
+    export async function getAllProjectsCtrl(req, res) {
+    
+      try {
+    
+        // Call the model function to get the projects
+        const allProjects = await getAllProjects();
+    
+        if (!allProjects || allProjects.length === 0) {
+          return res.status(404).json({ message: 'No projects found' });
         }
-        
-        const insertId = await insertUsersIntoProjects(projectId, userId, idRole);
-        insertResults.push({
-          id: insertId.toString(),
-          projectId: projectId.toString(),
-          userId: userId.toString(),
-          idRole: idRole.toString(),
-        });
+    
+        res.json(allProjects);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
       }
-  
-      res.json({ success: true, users: insertResults });
-    } catch (error) {
-      console.error('Error creating users in project:', error);
-      res.status(500).send('Internal Server Error');
     }
-  }
-
- 
-  //____________________get all projects__________________________________________________________________
-
-  export async function getProjects(req, res) {
-    try {
-      const projects = await getAllProjects();
-      res.json(projects);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      res.status(500).send('Internal Server Error');
-    }
-  }
-
-
-  
-  export async function getSingleProject(req, res) {
-    const { id } = req.params;
-    try {
-      const project = await getProjectById(id);
-      if (!project) {
-        return res.status(404).send('Project not found');
-      }
-      res.json(project);
-    } catch (error) {
-      console.error('Error fetching project:', error);
-      res.status(500).send('Internal Server Error');
-    }
-  }
-  
-  export async function createNewProject(req, res) {
-    const { project_name, repository_link } = req.body;
-    if (!project_name || !repository_link) {
-      return res.status(400).send('Missing parameters');
-    }
-  
-    try {
-      const insertId = await createProject(project_name, repository_link);
-      if (insertId) {
-        res.json({ id: Number(insertId), project_name, repository_link });
-      } else {
-        res.status(500).send('Unable to create project');
-      }
-    } catch (error) {
-      console.error('Error creating project:', error);
-      res.status(500).send('Internal Server Error');
-    }
-
-    //TODO
-    //populateProjectMembers
-  }
-  
-  export async function updateExistingProject(req, res) {
-    const { id } = req.params;
-    const { project_name, repository_link } = req.body;
-  
-    if (!project_name || !repository_link) {
-      return res.status(400).send('Missing parameters');
-    }
-  
-    try {
-      const success = await updateProject(id, project_name, repository_link);
-      if (success) {
-        res.json({ id, project_name, repository_link });
-      } else {
-        res.status(404).send('Project not found or not updated');
-      }
-    } catch (error) {
-      console.error('Error updating project:', error);
-      res.status(500).send('Internal Server Error');
-    }
-  }
-  
-  export async function removeProject(req, res) {
-    const { id } = req.params;
-    try {
-      const success = await deleteProject(id);
-      if (success) {
-        res.sendStatus(204); // No Content
-      } else {
-        res.status(404).send('Project not found');
-      }
-    } catch (error) {
-      console.error('Error deleting project:', error);
-      res.status(500).send('Internal Server Error');
-    }
-
-
-
-
-  }
-  
