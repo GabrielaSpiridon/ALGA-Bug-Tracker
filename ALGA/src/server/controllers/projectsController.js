@@ -1,6 +1,6 @@
 import {
     createNewProject,
-    insertUsersIntoProjects,
+    insertUsersIntoProject,
     getUserProjects,
     getAllProjects
   } from '../models/projectsModel.js';
@@ -36,39 +36,25 @@ import {
     //http://localhost:3000/projects/insertUser
     //{
     //   "projectId": 1,
-    //   "users": [
-    //     { "userId": 1, "idRole": 1 },
-    //     { "userId": 2, "idRole": 2 }
-    //   ]
+    //    "userId": 1,
+    //    "idRole": 1 },
+  
     // }
 
-    export async function insertUsersIntoProjectsCtrl(req, res) {
-      const { projectId, users } = req.body;
+    export async function insertUsersIntoProjectCtrl(req, res) {
+      const { projectId, userId, roleId } = req.body;
   
-      if (!projectId || !Array.isArray(users) || users.length === 0) {
-        return res.status(400).send('Missing parameters or invalid user list');
+      console.info('insertUsersIntoProjectCtrl ', projectId, userId, roleId);
+
+      if (!projectId || !userId ) {
+        return res.status(400).send('Missing parameters.');
       }
     
       try {
-        const insertResults = [];
-        for (const user of users) {
-          const { userId, idRole } = user;
-          if (!userId || !idRole) {
-            return res.status(400).send('Each user must have userId and idRole');
-          }
-          
-          const insertId = await insertUsersIntoProjects(projectId, userId, idRole);
-          insertResults.push({
-            id: insertId.toString(),
-            projectId: projectId.toString(),
-            userId: userId.toString(),
-            idRole: idRole.toString(),
-          });
-        }
-    
-        res.json({ success: true, users: insertResults });
+        const insertId = await insertUsersIntoProject(projectId, userId, roleId);    
+         res.json({ success: true, insertId:Number(insertId)});
       } catch (error) {
-        console.error('Error creating users in project:', error);
+        console.error('Error creating user in project:', error);
         res.status(500).send('Internal Server Error');
       }
     }

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   createNewProjectCtrl,
-  insertUsersIntoProjectsCtrl,
+  insertUsersIntoProjectCtrl,
   getUserProjectsCtrl,
   getAllProjectsCtrl
 } from '../controllers/projectsController.js';
@@ -10,6 +10,7 @@ const router = Router();
 
 
 // Create a new project
+//http://localhost:3000/projects/create
 router.post('/create', (req, res, next) => {
   console.log('Route hit via router: /create');
   next();
@@ -20,7 +21,7 @@ router.post('/create', (req, res, next) => {
 router.post('/insertUserIntoProject', (req, res, next) => {
   console.log('Route hit via router: /insertUserIntoProject');
   next();
-}, insertUsersIntoProjectsCtrl);
+}, insertUsersIntoProjectCtrl);
 
 
 //get projects from user id

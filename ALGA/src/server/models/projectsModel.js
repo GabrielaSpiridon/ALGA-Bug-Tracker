@@ -13,7 +13,7 @@ export async function createNewProject(projectName, perojectRepositoryLink){
 }
 
 //Update legatura users proiect
-export async function insertUsersIntoProjects(projecID, userID, userRoleID){
+export async function insertUsersIntoProject(projecID, userID, userRoleID){
   const conn = await pool.getConnection();
   try{
     const rows = await conn.query('INSERT INTO PROJECT_USER (id_project, id_user, id_role_user) VALUES (?, ?, ?);',

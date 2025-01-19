@@ -3,6 +3,8 @@ import axios from 'axios';
 
 import configuration from '../configuration';
 
+let  tester = 1;
+let  developer = 2;
 function Projects() {
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [projectName, setProjectName] = useState('');
@@ -62,15 +64,17 @@ function Projects() {
       return;
     }
   
+    const requestBody = {
+      userId: currentUserId,
+      projectId: selectedProject.id_project, 
+      roleId: roleId, // Pass the role ID (0 for Tester, 1 for Dev)
+    };
+    
     axios
-      .post('http://localhost:3000/projects/insertUserIntoProject', {
-        userId: currentUserId,
-        projectId: selectedProject.id_project,
-        role: roleId, // Pass the role ID (0 for Tester, 1 for Dev)
-      })
+      .post('http://localhost:3000/projects/insertUserIntoProject', requestBody)
       .then((response) => {
         if (response.status === 200) {
-          alert(`Successfully enrolled as ${roleId === 0 ? 'Tester' : 'Developer'}!`);
+          alert(`Successfully enrolled as ${roleId == tester ? 'Tester' : 'Developer'}!`);
           fetchUserProjects(); // Refresh the user's projects
         }
       })
@@ -88,11 +92,12 @@ function Projects() {
       return;
     }
 
+    const requestBody = {
+      project_name: projectName,
+      repository_link: projectGitHubUrl,
+    };
     axios
-      .post('http://localhost:3000/create', {
-        projectName,
-        projectGitHubUrl,
-      })
+      .post('http://localhost:3000/projects/create',requestBody)
       .then((response) => {
         if (response.status === 200) {
           alert('Project created successfully!');
@@ -239,13 +244,13 @@ function Projects() {
               {showEnrollButtons && (
                 <div>
                   <button 
-                       onClick={() => handleAddProjectUser(0)}
+                       onClick={() => handleAddProjectUser(tester)}
                       style={{ marginRight: '10px' }}>
                       Enroll as Tester
                   </button>
                   
                   <button 
-                       onClick={() => handleAddProjectUser(1)}
+                       onClick={() => handleAddProjectUser(developer)}
                       style={{ marginRight: '10px' }}>
                       Enroll as Dev
                   </button>
