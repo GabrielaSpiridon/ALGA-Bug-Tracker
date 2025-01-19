@@ -25,6 +25,23 @@ async function fetchBugsByProjectId(projectId) {
   }
 }
 
+async function markBugAsResolved(bugId, idProject, commitLink) {
+  try {
+
+    const requestBody = {
+      id_bug: bugId,
+      id_project: idProject, 
+      solution_status: 'Resolved',
+      link_commit_resolve_bug: commitLink,
+    };
+    const response = await axios.post(`http://localhost:3000/bugs/updateStatusBugCtrl`,requestBody) ;
+    return response.data;
+  } catch (error) {
+    console.error('Failed to mark bug as resolved:', error);
+    throw new Error('Error marking bug as resolved');
+  }
+}
+
 function MyHome() {
   const userId = configuration.currentUserId;
   console.log('Current userId:', userId);
@@ -35,6 +52,9 @@ function MyHome() {
   const [bugs, setBugs] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [selectedBug, setSelectedBug] = useState(null);
+  const [commitLink, setCommitLink] = useState('');
+  const [showResolvedForm, setShowResolvedForm] = useState(false);
+  
 
   useEffect(() => {
     if (!userId || userId === 0) {
@@ -65,6 +85,32 @@ function MyHome() {
         .catch((error) => console.error('Failed to fetch bugs:', error));
     }
   }, [selectedProjectId]);
+
+
+  const handleResolvedBug = () => {
+    setShowResolvedForm(true); 
+  };
+
+  const handleResolvedSubmit = async (e) => {
+    e.preventDefault();
+    if (!commitLink.trim()) {
+      alert('Please enter a valid commit link.');
+      return;
+    }
+
+    try {
+      await markBugAsResolved(selectedBug.id_bug, selectedProjectId, commitLink);
+      alert('Bug marked as resolved!');
+      setShowResolvedForm(false); 
+      setCommitLink(''); 
+      selectedBug.solution_status = "Resolved";
+     
+    } catch (error) {
+      alert('Failed to mark bug as resolved.');
+    }
+  };
+
+
 
   const containerStyle = {
     display: 'flex',
@@ -183,13 +229,31 @@ function MyHome() {
                 ))}
               </tbody>
             </table>
+            
             <button
-              className='button'
+              style={{ marginTop: '10px' }}
               onClick={() => selectedBug && console.log(`Resolve bug ${selectedBug.id_bug}`)}
               disabled={!selectedBug}
             >
               Resolve Bug
             </button>
+            
+             {/* Formular pentru rezolvarea bugului */}
+             {showResolvedForm && (
+              <form onSubmit={handleResolvedSubmit}>
+                <label>
+                  Commit Link:
+                  <input
+                    type="text"
+                    value={commitLink}
+                    onChange={(e) => setCommitLink(e.target.value)}
+                    placeholder="Enter commit link"
+                  />
+                </label>
+                <button type="submit">Submit</button>
+                <button type="button" onClick={() => setShowResolvedForm(false)}>Cancel</button>
+              </form>
+            )}
           </div>
         ) : (
           <div>Please select a project from the left panel to see its bugs.</div>
