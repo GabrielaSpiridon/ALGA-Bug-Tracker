@@ -13,6 +13,19 @@ async function fetchUserBugs(userId) {
   }
 }
 
+async function updateSolver(bugId, userId) {
+  try {
+    const response = await axios.put(`http://localhost:3000/bugs/updateStatusAssignedBugCtrl`, {
+      id_bug : bugId,
+      id_user_solver: userId
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to assign as solver:', error);
+    throw new Error('Error assigning solver');
+  }
+}
+
 function Bugs() {
   const userId = configuration.currentUserId;
   const [bugs, setBugs] = useState([]);
@@ -25,6 +38,44 @@ function Bugs() {
         .catch((error) => console.error('Failed to fetch bugs:', error));
     }
   }, [userId]);
+
+  const handleAssignSolver = async () => {
+    if (selectedBug && userId) {
+      try {
+        if (selectedBug.solution_status.toUpperCase() === 'RESOLVED') {
+          alert('This bug is already resolved and cannot be assigned.');
+          return;
+        }
+
+        await updateSolver(selectedBug.id_bug, userId);
+        alert('You have been assigned as the solver!');
+        // Refresh the list of bugs after assigning
+        const updatedBugs = await fetchUserBugs(userId);
+        setBugs(updatedBugs);
+      } catch (error) {
+        alert('Failed to assign as solver.');
+      }
+    }
+  };
+  const handleResolvedBug = async () => {
+    // if (selectedBug && userId) {
+    //   try {
+    //     if (selectedBug.solution_status.toUpperCase() === 'RESOLVED') {
+    //       alert('This bug is already resolved and cannot be assigned.');
+    //       return;
+    //     }
+
+    //     await updateSolver(selectedBug.id_bug, userId);
+    //     alert('You have been assigned as the solver!');
+    //     // Refresh the list of bugs after assigning
+    //     const updatedBugs = await fetchUserBugs(userId);
+    //     setBugs(updatedBugs);
+    //   } catch (error) {
+    //     alert('Failed to assign as solver.');
+    //   }
+    // }
+  };
+
 
   const containerStyle = {
     display: 'flex',
@@ -67,7 +118,7 @@ function Bugs() {
     <div style={containerStyle}>
       {/* My Bugs Column */}
       <div style={halfStyle}>
-        <div style={titleStyle}>My Bugs</div>
+        <div style={titleStyle}>Bugs from my projects</div>
         <table style={tableStyle}>
           <thead>
             <tr>
@@ -78,8 +129,8 @@ function Bugs() {
           <tbody>
             {bugs.map((bug) => (
               <tr
-                key={bug.id_bug}
-                style={selectedBug?.id_bug === bug.id_bug ? selectedRowStyle : {}}
+               key={bug.id_bug}
+                style={selectedBug?.id_bug == bug.id_bug ? selectedRowStyle : {}}
                 onClick={() => setSelectedBug(bug)}
               >
                 <td style={thTdStyle}>{bug.project_name}</td>
@@ -100,6 +151,20 @@ function Bugs() {
             <p><strong>Status:</strong> {selectedBug.solution_status}</p>
             <p><strong>Severity:</strong> {selectedBug.severity_level}</p>
             <p><strong>Priority:</strong> {selectedBug.solve_priority}</p>
+            <p><strong>Assigned to:</strong>{selectedBug.user_name}</p>
+            {(selectedBug.solution_status.toUpperCase() !== 'RESOLVED' && selectedBug.user_name.toUpperCase() === 'UNASSIGNED') && (
+              <button onClick={handleAssignSolver}>
+                Assign as Solver
+              </button>
+            )}
+            {(selectedBug.solution_status.toUpperCase() !== 'RESOLVED' && selectedBug.user_name.toUpperCase() !== 'UNASSIGNED') && ( // && selectedBug.id_user_solver=== configuration.currentUserId
+              <button onClick={handleResolvedBug}>
+                Solved
+              </button>
+            )}
+            {selectedBug.solution_status.toUpperCase() === 'RESOLVED' && (
+              <p>This bug is already resolved.</p>
+            )}
           </div>
         ) : (
           <div>Select a bug from the list to see its details.</div>
