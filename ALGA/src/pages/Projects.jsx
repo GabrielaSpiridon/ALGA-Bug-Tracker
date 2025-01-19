@@ -160,7 +160,7 @@ function Projects() {
   return (
     <div 
       className='largeContainer'
-      style={{ padding: '30px' }}>
+      style={{width: '90%', margin: '0 auto', padding: '30px' }}>
       
       <div 
         className='containerProjects'

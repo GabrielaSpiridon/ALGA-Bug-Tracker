@@ -115,7 +115,7 @@ function MyHome() {
   const containerStyle = {
     display: 'flex',
     flexDirection: 'row',
-    padding: '20px',
+    padding: '100px',
     gap: '20px',
   };
 
@@ -154,112 +154,119 @@ function MyHome() {
   const selectedProjectName = projects.find((project) => project.id_project === selectedProjectId)?.project_name || '';
 
   return (
-    <div
-      className='largeContainer' 
-      style={containerStyle}>
-      <div style={halfStyle}>
-        <div style={titleStyle}>My Projects</div>
-        <table style={tableStyle}>
-          <thead>
-            <tr>
-              <th style={thTdStyle}>Project ID</th>
-              <th style={thTdStyle}>Project Name</th>
-              <th style={thTdStyle}>Repository Link</th>
-              <th style={thTdStyle}>Role</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.map((project) => {
-              const isSelected = project.id_project === selectedProjectId;
-              return (
-                <tr
-                  key={project.id_project}
-                  style={isSelected ? selectedRowStyle : {}}
-                  onClick={() => setSelectedProjectId(project.id_project)}
-                >
-                  <td style={thTdStyle}>{project.id_project}</td>
-                  <td style={thTdStyle}>{project.project_name}</td>
-                  <td style={thTdStyle}><a href={project.repository_link} target="_blank" rel="noopener noreferrer">{project.repository_link}</a></td>
-                  <td style={thTdStyle}>{project.role_name}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <button
-          style={{ marginTop: '10px' }}
-          onClick={() => selectedProjectId && fetchBugsByProjectId(selectedProjectId)}
-          disabled={!selectedProjectId}
-        >
-          Report New Bug
-        </button>
-      </div>
-
+    <div 
+          className = 'containerProjects'>
+          <h3>All Projects</h3>
       <div 
-        className='container'
-        style={halfStyle}>
-        <div style={titleStyle}>Reported bugs for project {selectedProjectName}</div>
-        {selectedProjectId ? (
-          <div>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thTdStyle}>ID</th>
-                  <th style={thTdStyle}>Description</th>
-                  <th style={thTdStyle}>Status</th>
-                  <th style={thTdStyle}>Priority</th>
-                  <th style={thTdStyle}>Severity</th>
-                  <th style={thTdStyle}>Solver</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBugs.map((bug) => (
+        className='largeContainer'
+        style={containerStyle}>
+        <div 
+          className='containerProjects'
+          style={{overflowY: 'auto', maxHeight: '600px', maxWidth: '700'}}>
+          <div style={titleStyle}>My Projects</div>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thTdStyle}>Project ID</th>
+                <th style={thTdStyle}>Project Name</th>
+                <th style={thTdStyle}>Repository Link</th>
+                <th style={thTdStyle}>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {projects.map((project) => {
+                const isSelected = project.id_project === selectedProjectId;
+                return (
                   <tr
-                    key={bug.id_bug}
-                    style={selectedBug?.id_bug === bug.id_bug ? selectedRowStyle : {}}
-                    onClick={() => setSelectedBug(bug)}
+                    key={project.id_project}
+                    style={isSelected ? selectedRowStyle : {}}
+                    onClick={() => setSelectedProjectId(project.id_project)}
                   >
-                    <td style={thTdStyle}>{bug.id_bug}</td>
-                    <td style={thTdStyle}>{bug.bug_description}</td>
-                    <td style={thTdStyle}>{bug.solution_status}</td>
-                    <td style={thTdStyle}>{bug.solve_priority}</td>
-                    <td style={thTdStyle}>{bug.severity_level}</td>
-                    <td style={thTdStyle}>{bug.user_name}</td>
+                    <td style={thTdStyle}>{project.id_project}</td>
+                    <td style={thTdStyle}>{project.project_name}</td>
+                    <td style={thTdStyle}><a href={project.repository_link} target="_blank" rel="noopener noreferrer">{project.repository_link}</a></td>
+                    <td style={thTdStyle}>{project.role_name}</td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            
-            <button
-              style={{ marginTop: '10px' }}
-              onClick={() => selectedBug && console.log(`Resolve bug ${selectedBug.id_bug}`)}
-              disabled={!selectedBug}
-            >
-              Resolve Bug
-            </button>
-            
-             {/* Formular pentru rezolvarea bugului */}
-             {showResolvedForm && (
-              <form onSubmit={handleResolvedSubmit}>
-                <label>
-                  Commit Link:
-                  <input
-                    type="text"
-                    value={commitLink}
-                    onChange={(e) => setCommitLink(e.target.value)}
-                    placeholder="Enter commit link"
-                  />
-                </label>
-                <button type="submit">Submit</button>
-                <button type="button" onClick={() => setShowResolvedForm(false)}>Cancel</button>
-              </form>
-            )}
-          </div>
-        ) : (
-          <div>Please select a project from the left panel to see its bugs.</div>
-        )}
+                );
+              })}
+            </tbody>
+          </table>
+          <button
+            className='button'
+            onClick={() => selectedProjectId && fetchBugsByProjectId(selectedProjectId)}
+            disabled={!selectedProjectId}
+          >
+            Report New Bug
+          </button>
+        </div>
+
+        <div 
+          className='containerProjects'
+          style={{overflowY: 'auto', maxHeight: '400px', maxWidth: '500'}}>
+          <div style={titleStyle}>Reported bugs for project {selectedProjectName}</div>
+          {selectedProjectId ? (
+            <div>
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thTdStyle}>ID</th>
+                    <th style={thTdStyle}>Description</th>
+                    <th style={thTdStyle}>Status</th>
+                    <th style={thTdStyle}>Priority</th>
+                    <th style={thTdStyle}>Severity</th>
+                    <th style={thTdStyle}>Solver</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBugs.map((bug) => (
+                    <tr
+                      key={bug.id_bug}
+                      style={selectedBug?.id_bug === bug.id_bug ? selectedRowStyle : {}}
+                      onClick={() => setSelectedBug(bug)}
+                    >
+                      <td style={thTdStyle}>{bug.id_bug}</td>
+                      <td style={thTdStyle}>{bug.bug_description}</td>
+                      <td style={thTdStyle}>{bug.solution_status}</td>
+                      <td style={thTdStyle}>{bug.solve_priority}</td>
+                      <td style={thTdStyle}>{bug.severity_level}</td>
+                      <td style={thTdStyle}>{bug.user_name}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              
+              <button
+                className='button'
+                onClick={handleResolvedBug}
+                disabled={!selectedBug || selectedBug.solution_status.toUpperCase() === 'RESOLVED' || selectedBug.id_user_solver !== configuration.currentUserId }
+              >
+                Resolve Bug
+              </button>
+              
+              {/* Formular pentru rezolvarea bugului */}
+              {showResolvedForm && (
+                <form onSubmit={handleResolvedSubmit}>
+                  <label>
+                    Commit Link:
+                    <input
+                      type="text"
+                      value={commitLink}
+                      onChange={(e) => setCommitLink(e.target.value)}
+                      placeholder="Enter commit link"
+                    />
+                  </label>
+                  <button type="submit">Submit</button>
+                  <button type="button" onClick={() => setShowResolvedForm(false)}>Cancel</button>
+                </form>
+              )}
+            </div>
+          ) : (
+            <div>Please select a project from the left panel to see its bugs.</div>
+          )}
+        </div>
       </div>
     </div>
+  
   );
 }
 

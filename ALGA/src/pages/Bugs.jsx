@@ -156,8 +156,13 @@ function Bugs() {
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={halfStyle}>
+    <div 
+      className='largeContainer'
+      style={containerStyle}>
+      
+      <div 
+        className='containerProjects'
+        style={halfStyle}>
         <div style={titleStyle}>Bugs from my projects</div>
         <table style={tableStyle}>
           <thead>
@@ -181,8 +186,10 @@ function Bugs() {
         </table>
       </div>
 
-      <div style={halfStyle}>
-        <div style={titleStyle}>Bug Details</div>
+      <div 
+        style={halfStyle}>
+        <div 
+        style={titleStyle}>Bug Details</div>
         {selectedBug ? (
           <div>
             <p><strong>Project Name:</strong> {selectedBug.project_name}</p>
