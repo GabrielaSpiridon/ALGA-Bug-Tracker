@@ -229,7 +229,7 @@ function MyHome() {
             <button
               style={{ marginTop: '10px' }}
               onClick={handleResolvedBug}
-              disabled={!selectedBug || selectedBug.solution_status.toUpperCase() === 'RESOLVED'  }
+              disabled={!selectedBug || selectedBug.solution_status.toUpperCase() === 'RESOLVED' || selectedBug.id_user_solver !== configuration.currentUserId }
             >
               Resolve Bug
             </button>

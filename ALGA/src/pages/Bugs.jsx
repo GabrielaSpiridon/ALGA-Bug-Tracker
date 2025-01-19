@@ -90,19 +90,33 @@ function Bugs() {
       alert('Please enter a valid commit link.');
       return;
     }
-
+  
     try {
+      // Update the bug's status in the backend
       await markBugAsResolved(selectedBug.id_bug, selectedBug.id_project, commitLink);
+  
       alert('Bug marked as resolved!');
-      setShowResolvedForm(false); 
-      setCommitLink(''); 
-      const updatedBugs = await fetchUserBugs(userId);
-      const uniqueBugs = Array.from(new Map(updatedBugs.map((bug) => [bug.id_bug, bug])).values());
-      setBugs(uniqueBugs);
+  
+      // Update the local state for selectedBug and bugs
+      setSelectedBug((prev) => ({
+        ...prev,
+        solution_status: 'Resolved', // Update status to "Resolved"
+      }));
+  
+      setBugs((prevBugs) =>
+        prevBugs.map((bug) =>
+          bug.id_bug === selectedBug.id_bug ? { ...bug, solution_status: 'Resolved' } : bug
+        )
+      );
+  
+      // Reset form state
+      setShowResolvedForm(false);
+      setCommitLink('');
     } catch (error) {
       alert('Failed to mark bug as resolved.');
     }
   };
+  
 
   const containerStyle = {
     display: 'flex',

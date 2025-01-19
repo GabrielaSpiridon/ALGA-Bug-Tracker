@@ -17,7 +17,7 @@ export async function getUserBugs(userId){
 export async function getProjectBugs(projectId){
   const conn = await pool.getConnection();
   try{
-    const rows = await conn.query(`SELECT u.user_name,b.id_bug, b.severity_level, b.solve_priority,b.bug_description,b.solution_status FROM project_bug pb JOIN bug b ON b.id_bug = pb.id_bug JOIN user u ON pb.id_user_solver = u.id_user WHERE pb.id_project=? `, projectId)
+    const rows = await conn.query(`SELECT u.user_name, pb.id_user_solver, b.id_bug, b.severity_level, b.solve_priority,b.bug_description,b.solution_status FROM project_bug pb JOIN bug b ON b.id_bug = pb.id_bug JOIN user u ON pb.id_user_solver = u.id_user WHERE pb.id_project=? `, projectId)
     return rows;
   } finally {
     conn.release();
