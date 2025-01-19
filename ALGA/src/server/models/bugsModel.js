@@ -5,7 +5,7 @@ import pool from '../db/connection.js';
 export async function getUserBugs(userId){
   const conn = await pool.getConnection();
   try{
-    const rows = await conn.query(`SELECT COALESCE(u.user_name, 'Unassigned') AS user_name,pb.id_user_solver, p.project_name, b.id_bug, b.severity_level, b.solve_priority, b.bug_description, b.solution_status FROM project_bug pb JOIN bug b ON b.id_bug = pb.id_bug LEFT JOIN user u ON pb.id_user_solver = u.id_user JOIN project_user pu ON pu.id_user = pb.id_user_reporter JOIN user_role ur ON ur.id_role = pu.id_role_user JOIN commit c ON b.id_commit_report_bug = c.id_commit JOIN project_commit pc ON c.id_commit = pc.id_commit JOIN project p ON pc.id_project = p.id_project WHERE pu.id_user = 1 AND UPPER(ur.role_name) = 'DEVELOPER';
+    const rows = await conn.query(`SELECT COALESCE(u.user_name, 'Unassigned') AS user_name,pb.id_user_solver, pb.id_project, p.project_name, b.id_bug, b.severity_level, b.solve_priority, b.bug_description, b.solution_status FROM project_bug pb JOIN bug b ON b.id_bug = pb.id_bug LEFT JOIN user u ON pb.id_user_solver = u.id_user JOIN project_user pu ON pu.id_user = pb.id_user_reporter JOIN user_role ur ON ur.id_role = pu.id_role_user JOIN commit c ON b.id_commit_report_bug = c.id_commit JOIN project_commit pc ON c.id_commit = pc.id_commit JOIN project p ON pc.id_project = p.id_project WHERE pu.id_user = ? AND UPPER(ur.role_name) = 'DEVELOPER';
 `, userId)
     return rows;
   } finally {
@@ -35,7 +35,6 @@ export async function getAllBugsData() {
   }
 }
 
-
 export async function getBugById(id) {
   const conn = await pool.getConnection();
   try {
@@ -49,14 +48,35 @@ export async function getBugById(id) {
   }
 }
 
-export async function createBug(severity_level, solve_priority,bug_description,solution_status) {
+export async function createBug(id_project,commit_link,severity_level, solve_priority,bug_description,solution_status,id_commit_report_bug,id_user_reporter) {
   const conn = await pool.getConnection();
   try {
-    const result = await conn.query(
-      'INSERT INTO Bug (severity_level, solve_priority,bug_description,solution_status) VALUES(?,?,?,?)',
-      [severity_level, solve_priority,bug_description,solution_status]
+
+    const updateCommit= await conn.query(`INSERT INTO Commit (commit_link) VALUES (?)`,
+      [commit_link]
     );
-    return result.insertId;
+
+    // Safely convert BigInt to Number
+    const idCommit = typeof updateCommit.insertId === 'bigint' ? Number(updateCommit.insertId) : updateCommit.insertId;
+
+    const updateProjectCommit = await conn.query(`INSERT INTO Project_Commit (id_project, id_commit) VALUES (?,?)`,
+      [id_project,idCommit]
+    );
+
+    const result = await conn.query(
+      'INSERT INTO Bug (severity_level, solve_priority,bug_description,solution_status,id_commit_report_bug) VALUES(?,?,?,?,?)',
+      [severity_level, solve_priority,bug_description,solution_status,idCommit]
+    );
+
+   
+    // Safely convert BigInt to Number
+    const idBug = typeof result.insertId === 'bigint' ? Number(result.insertId) : result.insertId;
+    
+    const updateProjectBug = await conn.query(`INSERT INTO Project_Bug (id_project, id_bug,id_user_reporter) VALUES (?,?,?)`,
+      [id_project,idBug,id_user_reporter]
+    );
+
+    return idBug;
   } catch (err) {
     console.error('Error creating project:', err);
     return null;
@@ -81,12 +101,23 @@ export async function updateBug(id_bug,severity_level, solve_priority, bug_descr
   }
 }
 
-export async function updateStatusBug(id_bug,solution_status,id_commit_resolve_bug) {
+export async function updateStatusBug(id_bug,id_project,solution_status,link_commit_resolve_bug) {
   const conn = await pool.getConnection();
    try {
+
+    const updateCommit = await conn.query(`INSERT INTO COMMIT (commit_link) VALUES (?)`,
+      [link_commit_resolve_bug]
+    );
+
+    const idCommit = updateCommit.insertId;
+    
+    const updatePrjCommit = await conn.query(`INSERT INTO PROJECT_COMMIT (id_project, id_commit) VALUES (?,?)`,
+      [id_project,idCommit]
+    );
+    
     const result = await conn.query(
       'UPDATE BUG SET solution_status=?,id_commit_resolve_bug=? WHERE id_bug = ?',
-      [ solution_status, id_commit_resolve_bug,id_bug]
+      [ solution_status, idCommit,id_bug]
     );
     return result.affectedRows > 0;
   } catch (err) {

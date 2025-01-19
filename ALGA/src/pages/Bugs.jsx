@@ -16,8 +16,8 @@ async function fetchUserBugs(userId) {
 async function updateSolver(bugId, userId) {
   try {
     const response = await axios.put(`http://localhost:3000/bugs/updateStatusAssignedBugCtrl`, {
-      id_bug : bugId,
-      id_user_solver: userId
+      id_bug: bugId,
+      id_user_solver: userId,
     });
     return response.data;
   } catch (error) {
@@ -26,10 +26,30 @@ async function updateSolver(bugId, userId) {
   }
 }
 
+async function markBugAsResolved(bugId, idProject, commitLink) {
+  try {
+
+    const requestBody = {
+      id_bug: bugId,
+      id_project: idProject, 
+      solution_status: 'Resolved',
+      link_commit_resolve_bug: commitLink,
+    };
+    const response = await axios.post(`http://localhost:3000/bugs/updateStatusBugCtrl`,requestBody) ;
+    return response.data;
+  } catch (error) {
+    console.error('Failed to mark bug as resolved:', error);
+    throw new Error('Error marking bug as resolved');
+  }
+}
+
+
 function Bugs() {
   const userId = configuration.currentUserId;
   const [bugs, setBugs] = useState([]);
   const [selectedBug, setSelectedBug] = useState(null);
+  const [showResolvedForm, setShowResolvedForm] = useState(false);
+  const [commitLink, setCommitLink] = useState('');
 
   useEffect(() => {
     if (userId) {
@@ -49,7 +69,6 @@ function Bugs() {
 
         await updateSolver(selectedBug.id_bug, userId);
         alert('You have been assigned as the solver!');
-        // Refresh the list of bugs after assigning
         const updatedBugs = await fetchUserBugs(userId);
         setBugs(updatedBugs);
       } catch (error) {
@@ -57,25 +76,29 @@ function Bugs() {
       }
     }
   };
-  const handleResolvedBug = async () => {
-    // if (selectedBug && userId) {
-    //   try {
-    //     if (selectedBug.solution_status.toUpperCase() === 'RESOLVED') {
-    //       alert('This bug is already resolved and cannot be assigned.');
-    //       return;
-    //     }
 
-    //     await updateSolver(selectedBug.id_bug, userId);
-    //     alert('You have been assigned as the solver!');
-    //     // Refresh the list of bugs after assigning
-    //     const updatedBugs = await fetchUserBugs(userId);
-    //     setBugs(updatedBugs);
-    //   } catch (error) {
-    //     alert('Failed to assign as solver.');
-    //   }
-    // }
+  const handleResolvedBug = () => {
+    setShowResolvedForm(true); 
   };
 
+  const handleResolvedSubmit = async (e) => {
+    e.preventDefault();
+    if (!commitLink.trim()) {
+      alert('Please enter a valid commit link.');
+      return;
+    }
+
+    try {
+      await markBugAsResolved(selectedBug.id_bug, selectedBug.id_project,commitLink);
+      alert('Bug marked as resolved!');
+      setShowResolvedForm(false); 
+      setCommitLink(''); 
+      const updatedBugs = await fetchUserBugs(userId);
+      setBugs(updatedBugs);
+    } catch (error) {
+      alert('Failed to mark bug as resolved.');
+    }
+  };
 
   const containerStyle = {
     display: 'flex',
@@ -129,7 +152,7 @@ function Bugs() {
           <tbody>
             {bugs.map((bug) => (
               <tr
-               key={bug.id_bug}
+                key={bug.id_bug}
                 style={selectedBug?.id_bug == bug.id_bug ? selectedRowStyle : {}}
                 onClick={() => setSelectedBug(bug)}
               >
@@ -157,13 +180,30 @@ function Bugs() {
                 Assign as Solver
               </button>
             )}
-            {(selectedBug.solution_status.toUpperCase() !== 'RESOLVED' && selectedBug.user_name.toUpperCase() !== 'UNASSIGNED' && selectedBug.id_user_solver == configuration.currentUserId) && ( // && selectedBug.id_user_solver=== configuration.currentUserId
+            {(selectedBug.solution_status.toUpperCase() !== 'RESOLVED' && selectedBug.user_name.toUpperCase() !== 'UNASSIGNED' && selectedBug.id_user_solver == configuration.currentUserId) && (
               <button onClick={handleResolvedBug}>
                 Solved
               </button>
             )}
             {selectedBug.solution_status.toUpperCase() === 'RESOLVED' && (
               <p>This bug is already resolved.</p>
+            )}
+
+            {/* Formular pentru rezolvarea bugului */}
+            {showResolvedForm && (
+              <form onSubmit={handleResolvedSubmit}>
+                <label>
+                  Commit Link:
+                  <input
+                    type="text"
+                    value={commitLink}
+                    onChange={(e) => setCommitLink(e.target.value)}
+                    placeholder="Enter commit link"
+                  />
+                </label>
+                <button type="submit">Submit</button>
+                <button type="button" onClick={() => setShowResolvedForm(false)}>Cancel</button>
+              </form>
             )}
           </div>
         ) : (
