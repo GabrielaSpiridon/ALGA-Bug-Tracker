@@ -78,7 +78,7 @@ function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="d-flex align-items-center justify-content-center vh-100">
+    <div className="largeContainer">
       <div style={{ width: "100%", maxWidth: "400px" }}>
         <h2 className="text-center mb-4">Login to ALGABugTracker</h2>
         <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
@@ -91,7 +91,7 @@ function Login({ onLoginSuccess }) {
               className="form-control"
             />
           </div>
-          <div className="mb-3">
+          <div className="container">
             <input 
               type="password" 
               placeholder="Password"
@@ -100,9 +100,9 @@ function Login({ onLoginSuccess }) {
               className="form-control"
             />
           </div>
-          <button className="btn btn-primary w-100 mb-2" type="submit">Login</button>
+          <button className="button" type="submit">Login</button>
           <button 
-            className="btn btn-link w-100"
+            className="button"
             type="button" 
             onClick={() => navigate('/register')}
           >

@@ -1,7 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import configuration from '../configuration';
+
+import '../App.css';
 
 let tester = 1;
 let developer = 2;
@@ -155,24 +158,60 @@ function Projects() {
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Projects</h2>
-      <button onClick={toggleAddProject}>
-        {isAddingProject ? 'Cancel' : 'Add New Project'}
-      </button>
+    <div 
+      className='largeContainer'
+      style={{ padding: '30px' }}>
+      
+      <div 
+        className='containerProjects'
+        style={{ display: 'flex', alignItems: 'center' }}> 
+        <h2>Projects</h2>
+        
+        <button 
+          onClick={toggleAddProject}
+          className="button">
+
+          {isAddingProject ? 'Cancel' : '+'}
+        </button>
+      </div>
 
       {isAddingProject && (
         <div
-          style={{
-            marginTop: '20px',
-            border: '1px solid #ccc',
-            padding: '20px',
-            marginBottom: '20px',
-            display: 'flex',
-            gap: '20px',
-          }}
+          className='containerProjects'
+          style={{ display: 'flex', gap: '20px' }}
         >
-          <div style={{ flex: 1, overflowY: 'auto', maxHeight: '400px', border: '1px solid #ccc', padding: '10px' }}>
+          
+          <div style={{ flex: 1 }}>
+            <h3>Add New Project</h3>
+            <div style={{ marginBottom: '10px' }}>
+              <label>
+                Project Name:
+                <input
+                  type="text"
+                  placeholder="Enter project name"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  className='inputContainer'
+                />
+              </label>
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <label>
+                GitHub URL:
+                <input
+                  type="text"
+                  placeholder="Enter GitHub URL"
+                  value={projectGitHubUrl}
+                  onChange={(e) => setProjectGitHubUrl(e.target.value)}
+                  className='inputContainer'
+                />
+              </label>
+            </div>
+          </div>
+
+          <div 
+            className='containerProjects'
+            style={{ flex: 1, overflowY: 'auto', maxHeight: '250px', border: '1px solid #ccc', padding: '10px' }}>
             <h3>Select Users</h3>
             <ul style={{ listStyle: 'none', padding: 0 }}>
               {allUsers.length > 0 ? (
@@ -181,6 +220,7 @@ function Projects() {
                     <label>
                       <input
                         type="checkbox"
+                        className='inputContainer'
                         value={user.id_user}
                         onChange={(e) => {
                           const userId = parseInt(e.target.value, 10);
@@ -199,117 +239,69 @@ function Projects() {
                 <p>No users found.</p>
               )}
             </ul>
+
+            
           </div>
 
-          <div style={{ flex: 2 }}>
-            <h3>Add New Project</h3>
-            <div style={{ marginBottom: '10px' }}>
-              <label>
-                Project Name:
-                <input
-                  type="text"
-                  placeholder="Enter project name"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
-                  style={{ marginLeft: '10px' }}
-                />
-              </label>
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <label>
-                GitHub URL:
-                <input
-                  type="text"
-                  placeholder="Enter GitHub URL"
-                  value={projectGitHubUrl}
-                  onChange={(e) => setProjectGitHubUrl(e.target.value)}
-                  style={{ marginLeft: '10px' }}
-                />
-              </label>
-            </div>
-
-            <button style={{ marginTop: '10px' }} onClick={handleCreateProject}>
+          <div>
+            <button 
+              className="button"
+              onClick={handleCreateProject}>
               Submit
             </button>
-            <button
-              style={{ marginTop: '10px', marginLeft: '10px' }}
-              onClick={toggleAddProject}
-            >
-              Cancel
-            </button>
           </div>
+
         </div>
+        
+
+        
       )}
+
+
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
         {/* All Projects */}
-        <div style={{ flex: 1, border: '1px solid #ccc', padding: '20px', overflowY: 'auto', maxHeight: '400px' }}>
+        <div 
+          className = 'containerProjects'>
           <h3>All Projects</h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
-            <thead>
-              <tr>
-                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Project Name</th>
-                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Git URL</th>
-              </tr>
-            </thead>
-            <tbody>
-              {allProjects.length > 0 ? (
-                allProjects.map((project) => (
-                  <tr
-                    key={project.id_project}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => handleProjectClick(project, true)}
-                  >
-                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.project_name}</td>
-                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.repository_link}</td>
-                  </tr>
-                ))
-              ) : (
+          <div style={{overflowY: 'auto', maxHeight: '400px'}}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
+              <thead>
                 <tr>
-                  <td colSpan="2" style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
-                    No projects found.
-                  </td>
+                  <th style={{ border: '1px solid #ccc', padding: '8px' }}>Project Name</th>
+                  <th style={{ border: '1px solid #ccc', padding: '8px' }}>Git URL</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* User Projects */}
-        <div style={{ flex: 1, border: '1px solid #ccc', padding: '20px', overflowY: 'auto', maxHeight: '400px' }}>
-          <h3>My Projects</h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
-            <thead>
-              <tr>
-                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Project Name</th>
-                <th style={{ border: '1px solid #ccc', padding: '8px' }}>Git URL</th>
-              </tr>
-            </thead>
-            <tbody>
-              {userProjects.length > 0 ? (
-                userProjects.map((project) => (
-                  <tr
-                    key={project.id_project}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => handleProjectClick(project, false)}
-                  >
-                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.project_name}</td>
-                    <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.repository_link}</td>
+              </thead>
+              <tbody>
+                {allProjects.length > 0 ? (
+                  allProjects.map((project) => {
+                    const isUserProject = userProjects.some(userProject => userProject.id_project === project.id_project);
+                    return (
+                      <tr
+                        key={project.id_project}
+                        style={{ cursor: 'pointer', backgroundColor: isUserProject ? 'lightgreen' : 'transparent' }}
+                        onClick={() => handleProjectClick(project, true)}
+                      >
+                        <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.project_name}</td>
+                        <td style={{ border: '1px solid #ccc', padding: '8px' }}>{project.repository_link}</td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="2" style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
+                      No projects found.
+                    </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="2" style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
-                    No projects found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Project Details */}
-        <div style={{ flex: 1, border: '1px solid #ccc', padding: '20px' }}>
+        <div
+           className="containerProjects" >
           <h3>Project Details</h3>
           {selectedProject ? (
             <div>
@@ -318,16 +310,11 @@ function Projects() {
               {showEnrollButtons && (
                 <div>
                   <button 
-                       onClick={() => handleAddProjectUser(tester)}
-                      style={{ marginRight: '10px' }}>
+                      className="button"
+                      onClick={() => handleAddProjectUser(tester)}>
                       Enroll as Tester
                   </button>
                   
-                  <button 
-                       onClick={() => handleAddProjectUser(developer)}
-                      style={{ marginRight: '10px' }}>
-                      Enroll as Dev
-                  </button>
                 </div>
               )}
             </div>

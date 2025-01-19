@@ -108,7 +108,9 @@ function MyHome() {
   const selectedProjectName = projects.find((project) => project.id_project === selectedProjectId)?.project_name || '';
 
   return (
-    <div style={containerStyle}>
+    <div
+      className='largeContainer' 
+      style={containerStyle}>
       <div style={halfStyle}>
         <div style={titleStyle}>My Projects</div>
         <table style={tableStyle}>
@@ -147,7 +149,9 @@ function MyHome() {
         </button>
       </div>
 
-      <div style={halfStyle}>
+      <div 
+        className='container'
+        style={halfStyle}>
         <div style={titleStyle}>Reported bugs for project {selectedProjectName}</div>
         {selectedProjectId ? (
           <div>
@@ -180,7 +184,7 @@ function MyHome() {
               </tbody>
             </table>
             <button
-              style={{ marginTop: '10px' }}
+              className='button'
               onClick={() => selectedBug && console.log(`Resolve bug ${selectedBug.id_bug}`)}
               disabled={!selectedBug}
             >

@@ -42,7 +42,7 @@ function App() {
             element={isAuthenticated ? <Navigate to="/myHome" /> : (
               <div>
                 <Login onLoginSuccess={handleLoginSuccess} />
-                <div className="text-center mt-3">
+                 <div className="text-center mt-3">
                   <Link to="/register" className="btn btn-secondary">Go to Register</Link>
                 </div>
               </div>
@@ -55,7 +55,7 @@ function App() {
                 <Login onLoginSuccess={handleLoginSuccess} />
                 <div className="text-center mt-3">
                   <Link to="/register" className="btn btn-secondary">Go to Register</Link>
-                </div>
+                </div> 
               </div>
             )} 
           />
@@ -64,7 +64,7 @@ function App() {
             element={
               <div>
                 <Register />
-                <div className="text-center mt-3">
+                <div className="button">
                   <Link to="/login" className="btn btn-secondary">Back to Login</Link>
                 </div>
               </div>

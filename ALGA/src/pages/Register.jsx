@@ -35,7 +35,9 @@ function Register() {
 
   return (
     <div className="d-flex align-items-center justify-content-center vh-100">
-      <div style={{ width: "100%", maxWidth: "400px" }}>
+      <div 
+        className='containerProjects'
+        style={{ width: "100%", maxWidth: "400px" }}>
         <h2 className="text-center mb-4">Register for ALGABugTracker</h2>
         <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
         <div className="mb-3">
@@ -65,7 +67,9 @@ function Register() {
               className="form-control"
             />
           </div>
-          <button className="btn btn-primary w-100 mb-2" type="submit">Register</button>
+          <button 
+            className="button" 
+            >Register</button>
           <button 
             className="btn btn-link w-100"
             type="button" 
