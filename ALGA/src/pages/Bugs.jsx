@@ -28,21 +28,19 @@ async function updateSolver(bugId, userId) {
 
 async function markBugAsResolved(bugId, idProject, commitLink) {
   try {
-
     const requestBody = {
       id_bug: bugId,
       id_project: idProject, 
       solution_status: 'Resolved',
       link_commit_resolve_bug: commitLink,
     };
-    const response = await axios.post(`http://localhost:3000/bugs/updateStatusBugCtrl`,requestBody) ;
+    const response = await axios.post(`http://localhost:3000/bugs/updateStatusBugCtrl`, requestBody);
     return response.data;
   } catch (error) {
     console.error('Failed to mark bug as resolved:', error);
     throw new Error('Error marking bug as resolved');
   }
 }
-
 
 function Bugs() {
   const userId = configuration.currentUserId;
@@ -54,7 +52,11 @@ function Bugs() {
   useEffect(() => {
     if (userId) {
       fetchUserBugs(userId)
-        .then((data) => setBugs(data))
+        .then((data) => {
+          // Filter out duplicates by creating a Map with unique `id_bug` keys
+          const uniqueBugs = Array.from(new Map(data.map((bug) => [bug.id_bug, bug])).values());
+          setBugs(uniqueBugs);
+        })
         .catch((error) => console.error('Failed to fetch bugs:', error));
     }
   }, [userId]);
@@ -70,7 +72,8 @@ function Bugs() {
         await updateSolver(selectedBug.id_bug, userId);
         alert('You have been assigned as the solver!');
         const updatedBugs = await fetchUserBugs(userId);
-        setBugs(updatedBugs);
+        const uniqueBugs = Array.from(new Map(updatedBugs.map((bug) => [bug.id_bug, bug])).values());
+        setBugs(uniqueBugs);
       } catch (error) {
         alert('Failed to assign as solver.');
       }
@@ -89,12 +92,13 @@ function Bugs() {
     }
 
     try {
-      await markBugAsResolved(selectedBug.id_bug, selectedBug.id_project,commitLink);
+      await markBugAsResolved(selectedBug.id_bug, selectedBug.id_project, commitLink);
       alert('Bug marked as resolved!');
       setShowResolvedForm(false); 
       setCommitLink(''); 
       const updatedBugs = await fetchUserBugs(userId);
-      setBugs(updatedBugs);
+      const uniqueBugs = Array.from(new Map(updatedBugs.map((bug) => [bug.id_bug, bug])).values());
+      setBugs(uniqueBugs);
     } catch (error) {
       alert('Failed to mark bug as resolved.');
     }
@@ -139,7 +143,6 @@ function Bugs() {
 
   return (
     <div style={containerStyle}>
-      {/* My Bugs Column */}
       <div style={halfStyle}>
         <div style={titleStyle}>Bugs from my projects</div>
         <table style={tableStyle}>
@@ -153,7 +156,7 @@ function Bugs() {
             {bugs.map((bug) => (
               <tr
                 key={bug.id_bug}
-                style={selectedBug?.id_bug == bug.id_bug ? selectedRowStyle : {}}
+                style={selectedBug?.id_bug === bug.id_bug ? selectedRowStyle : {}}
                 onClick={() => setSelectedBug(bug)}
               >
                 <td style={thTdStyle}>{bug.project_name}</td>
@@ -164,7 +167,6 @@ function Bugs() {
         </table>
       </div>
 
-      {/* Bug Details Column */}
       <div style={halfStyle}>
         <div style={titleStyle}>Bug Details</div>
         {selectedBug ? (
@@ -174,22 +176,21 @@ function Bugs() {
             <p><strong>Status:</strong> {selectedBug.solution_status}</p>
             <p><strong>Severity:</strong> {selectedBug.severity_level}</p>
             <p><strong>Priority:</strong> {selectedBug.solve_priority}</p>
-            <p><strong>Assigned to:</strong>{selectedBug.user_name}</p>
+            <p><strong>Assigned to:</strong> {selectedBug.user_name}</p>
             {(selectedBug.solution_status.toUpperCase() !== 'RESOLVED' && selectedBug.user_name.toUpperCase() === 'UNASSIGNED') && (
               <button onClick={handleAssignSolver}>
                 Assign as Solver
               </button>
             )}
-            {(selectedBug.solution_status.toUpperCase() !== 'RESOLVED' && selectedBug.user_name.toUpperCase() !== 'UNASSIGNED' && selectedBug.id_user_solver == configuration.currentUserId) && (
+            {(selectedBug.solution_status.toUpperCase() !== 'RESOLVED' && selectedBug.user_name.toUpperCase() !== 'UNASSIGNED' && selectedBug.id_user_solver === configuration.currentUserId) && (
               <button onClick={handleResolvedBug}>
-                Solved
+                Resolve Bug
               </button>
             )}
             {selectedBug.solution_status.toUpperCase() === 'RESOLVED' && (
               <p>This bug is already resolved.</p>
             )}
 
-            {/* Formular pentru rezolvarea bugului */}
             {showResolvedForm && (
               <form onSubmit={handleResolvedSubmit}>
                 <label>
