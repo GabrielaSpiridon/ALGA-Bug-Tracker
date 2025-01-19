@@ -157,7 +157,7 @@ function Bugs() {
                 Assign as Solver
               </button>
             )}
-            {(selectedBug.solution_status.toUpperCase() !== 'RESOLVED' && selectedBug.user_name.toUpperCase() !== 'UNASSIGNED') && ( // && selectedBug.id_user_solver=== configuration.currentUserId
+            {(selectedBug.solution_status.toUpperCase() !== 'RESOLVED' && selectedBug.user_name.toUpperCase() !== 'UNASSIGNED' && selectedBug.id_user_solver == configuration.currentUserId) && ( // && selectedBug.id_user_solver=== configuration.currentUserId
               <button onClick={handleResolvedBug}>
                 Solved
               </button>
