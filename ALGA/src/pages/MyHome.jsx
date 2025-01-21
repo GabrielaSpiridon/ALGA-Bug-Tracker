@@ -122,40 +122,42 @@ function MyHome() {
    // Create a new bug
    function handleCreateBug() {
     if (!severityLevel || !solvePriority || !bugDescription) {
-      alert('Severity level, solve priority and bug description are all require.');
+      alert('Severity level, solve priority and bug description are all required.');
       return;
     }
-
-
+  
     const requestBody = {
-      id_project:selectedProjectId,
-      commit_link:commitLinkReport,
-      severity_level:severityLevel, 
-      solve_priority:solvePriority,
-      bug_description:bugDescription,
-      solution_status:"Unresolved",
-      id_commit_report_bug:0,
-      id_user_reporter:userId,
-    
+      id_project: selectedProjectId,
+      commit_link: commitLinkReport,
+      severity_level: severityLevel,
+      solve_priority: solvePriority,
+      bug_description: bugDescription,
+      solution_status: 'Unresolved',
+      id_commit_report_bug: 0,
+      id_user_reporter: userId,
     };
-
+  
     axios
       .post('http://localhost:3000/bugs/createNewBug', requestBody)
       .then((response) => {
         if (response.status === 200) {
           alert('Bug created successfully!');
-
-          const BugIdNumber = Number(response.data.insertId);
-          console.log('Bug ID as Number:', BugIdNumber);
-
           
-
-          setBug('');
           setBugDescription('');
-          setBugCommitLink(''); 
-          setIsAddingBug(false);
-          fetchAllProjects();
+          setBugCommitLinkReport('');
+          setSeverityLevel('');
+          setSolvePriority('');
+          setIsAddingBug(false); 
 
+          console.log(isAddingBug);
+          
+          if (selectedProjectId) {
+            fetchBugsByProjectId(selectedProjectId)
+              .then((data) => {
+                setBugs(data);
+              })
+              .catch((error) => console.error('Failed to fetch bugs:', error));
+          }
         }
       })
       .catch((error) => {
@@ -163,6 +165,7 @@ function MyHome() {
         alert('Error creating bug');
       });
   }
+  
 
 
   const containerStyle = {
