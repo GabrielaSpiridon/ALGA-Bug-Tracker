@@ -12,14 +12,13 @@ Aplicație web pentru gestionarea rezolvării bug-urilor
 **Frontend:** React.js
 	     - vom folosi AXIOS pentru a comunica cu API-ul de tip REST și pentru a obține sau trimite date către și de la un server
 	     - în principiu, nu planificăm să avem nevoie de state manager
-**Styling:** Tailwind CSS
+**Styling:** Bootstrap CSS
 
 **Development Environment:** Visual Studio Code
  
-**Mod de prezentare:** Opțiunea 1: Laptopul personal la seminar
-			Opțiunea 2: Hosting RoMarg ( vom confirma ulterior URL-ul exact)
+**Mod de prezentare:** Laptopul personal la seminar
 
-**Version Control:** GitHub
+**Version Control:** GitHub: https://github.com/GabrielaSpiridon/ALGA-Bug-Tracker
 
 **Descriere Arhitectura:** 
 Aplicatia de **frontend** comunica cu aplicatia de backend prin REST API.
@@ -31,7 +30,7 @@ Exemple: alga/api/buguri, alga/api/proiecte, alga/api/commituri etc.
 
 Backend-ul couminica cu baza de date pentru a citi si salva date si este responsabil pentru validari. 
 
-**Baza de date** stochează date în format relational normalizat, conform schemei atașate ( ne propunem sa mai ajustam schema în funcție de necesități).
+**Baza de date** stochează date în format relational normalizat, conform schemei atașate.
 
 **Build tools:** 
 Vom folosi Vite.dev
