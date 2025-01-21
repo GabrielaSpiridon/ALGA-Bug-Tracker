@@ -78,11 +78,11 @@ function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="largeContainer">
+    <div className="loginLargeContainer">
       <div style={{ width: "100%", maxWidth: "400px" }}>
         <h2 className="text-center mb-4">Login to ALGABugTracker</h2>
         <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
-          <div className="mb-3">
+          <div className="loginInputContainer">
             <input 
               type="text" 
               placeholder="Username"
@@ -91,7 +91,8 @@ function Login({ onLoginSuccess }) {
               className="form-control"
             />
           </div>
-          <div className="container">
+          <div 
+            className="loginInputContainer">
             <input 
               type="password" 
               placeholder="Password"
@@ -100,9 +101,9 @@ function Login({ onLoginSuccess }) {
               className="form-control"
             />
           </div>
-          <button className="button" type="submit">Login</button>
+          <button className="loginButton" type="submit">Login</button>
           <button 
-            className="button"
+            className="loginButton"
             type="button" 
             onClick={() => navigate('/register')}
           >

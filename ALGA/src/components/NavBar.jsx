@@ -13,7 +13,7 @@ function NavBar({ isAuthenticated, onLogout }) {
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collapse"
+          data-bs-toggle="collap  se"
           data-bs-target="#navbarNav"
           aria-controls="navbarNav"
           aria-expanded="false"
@@ -26,17 +26,17 @@ function NavBar({ isAuthenticated, onLogout }) {
         <div className="collapse navbar-collapse" id="navbarNav">
           {/* Navigation items aligned to the right */}
           <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link active" to="/">
-                MyHome
+            <li className="navBarButton">
+              <Link className="nav-link" to="/myHome">
+                Dashboard
               </Link>
             </li>
-            <li className="nav-item">
+            <li className="navBarButton">
               <Link className="nav-link" to="/projects">
                 Projects
               </Link>
             </li>
-            <li className="nav-item">
+            <li className="navBarButton">
               <Link className="nav-link" to="/bugs">
                 Bugs
               </Link>
@@ -46,11 +46,11 @@ function NavBar({ isAuthenticated, onLogout }) {
         </div>
       </div>
       {isAuthenticated ? (
-        <button onClick={onLogout} style={{ marginLeft: '10px' }}>
+        <button onClick={onLogout} className="loginNavBarButton">
           Logout
         </button>
       ) : (
-        <Link to="/login" style={{ marginLeft: '10px' }}>Login</Link>
+        <Link to="/login" className="loginNavBarButton">Login</Link>
       )}
     </nav>
   );
