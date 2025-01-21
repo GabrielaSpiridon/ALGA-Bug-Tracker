@@ -18,7 +18,7 @@ Aplicație web pentru gestionarea rezolvării bug-urilor
  
 **Mod de prezentare:** Laptopul personal la seminar
 
-**Version Control:** GitHub
+**Version Control:** GitHub: https://github.com/GabrielaSpiridon/ALGA-Bug-Tracker
 
 **Descriere Arhitectura:** 
 Aplicatia de **frontend** comunica cu aplicatia de backend prin REST API.
@@ -30,7 +30,7 @@ Exemple: alga/api/buguri, alga/api/proiecte, alga/api/commituri etc.
 
 Backend-ul couminica cu baza de date pentru a citi si salva date si este responsabil pentru validari. 
 
-**Baza de date** stochează date în format relational normalizat, conform schemei atașate ( ne propunem sa mai ajustam schema în funcție de necesități).
+**Baza de date** stochează date în format relational normalizat, conform schemei atașate.
 
 **Build tools:** 
 Vom folosi Vite.dev
