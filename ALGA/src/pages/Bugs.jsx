@@ -158,32 +158,40 @@ function Bugs() {
   return (
     <div 
       className='largeContainer'
-      style={containerStyle}>
+      style={{width: '90%', height: '80%', margin: '0 auto', padding: '30px' }}>
       
       <div 
         className='containerProjects'
-        style={halfStyle}>
-        <div style={titleStyle}>Bugs from my projects</div>
-        <table style={tableStyle}>
-          <thead>
-            <tr>
-              <th style={thTdStyle}>Project Name</th>
-              <th style={thTdStyle}>Bug Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bugs.map((bug) => (
-              <tr
-                key={bug.id_bug}
-                style={selectedBug?.id_bug === bug.id_bug ? selectedRowStyle : {}}
-                onClick={() => setSelectedBug(bug)}
-              >
-                <td style={thTdStyle}>{bug.project_name}</td>
-                <td style={thTdStyle}>{bug.bug_description}</td>
+        style={{ display: 'flex', alignItems: 'center' }}> 
+        <h2>Bugs</h2>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
+        <div 
+          className='containerProjects'
+          style={halfStyle}>
+          <div style={titleStyle}>Bugs from my projects</div>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thTdStyle}>Project Name</th>
+                <th style={thTdStyle}>Bug Description</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {bugs.map((bug) => (
+                <tr
+                  key={bug.id_bug}
+                  style={selectedBug?.id_bug === bug.id_bug ? selectedRowStyle : {}}
+                  onClick={() => setSelectedBug(bug)}
+                >
+                  <td style={thTdStyle}>{bug.project_name}</td>
+                  <td style={thTdStyle}>{bug.bug_description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div 

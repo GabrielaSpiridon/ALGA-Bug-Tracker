@@ -157,10 +157,15 @@ function Projects() {
       });
   }
 
+
   return (
     <div 
-      className='largeContainer'
-      style={{width: '90%', margin: '0 auto', padding: '30px' }}>
+      className='projectsMainContainer'
+      style={{
+        width: '90%', 
+        maxHeight: '500px', 
+        margin: '0 auto', 
+        padding: '30px' }}>
       
       <div 
         className='containerProjects'
@@ -176,6 +181,7 @@ function Projects() {
       </div>
 
       {isAddingProject && (
+
         <div
           className='containerProjects'
           style={{ display: 'flex', gap: '20px' }}

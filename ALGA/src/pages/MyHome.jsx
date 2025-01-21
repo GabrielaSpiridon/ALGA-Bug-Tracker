@@ -30,11 +30,11 @@ async function markBugAsResolved(bugId, idProject, commitLink) {
 
     const requestBody = {
       id_bug: bugId,
-      id_project: idProject, 
+      id_project: idProject,
       solution_status: 'Resolved',
       link_commit_resolve_bug: commitLink,
     };
-    const response = await axios.post(`http://localhost:3000/bugs/updateStatusBugCtrl`,requestBody) ;
+    const response = await axios.post(`http://localhost:3000/bugs/updateStatusBugCtrl`, requestBody);
     return response.data;
   } catch (error) {
     console.error('Failed to mark bug as resolved:', error);
@@ -57,8 +57,8 @@ function MyHome() {
   const [showResolvedForm, setShowResolvedForm] = useState(false);
   const [commitLinkReport, setBugCommitLinkReport] = useState('');
   const [bugDescription, setBugDescription] = useState('');
-  const [severityLevel,setBugSeverityLevel] = useState('');
-  const [solvePriority,setSolvePriority] = useState('');
+  const [severityLevel, setBugSeverityLevel] = useState('');
+  const [solvePriority, setSolvePriority] = useState('');
 
   const toggleAddBug = () => {
     setIsAddingBug(!isAddingBug);
@@ -97,7 +97,7 @@ function MyHome() {
 
 
   const handleResolvedBug = () => {
-    setShowResolvedForm(true); 
+    setShowResolvedForm(true);
   };
 
   const handleResolvedSubmit = async (e) => {
@@ -110,22 +110,22 @@ function MyHome() {
     try {
       await markBugAsResolved(selectedBug.id_bug, selectedProjectId, commitLink);
       alert('Bug marked as resolved!');
-      setShowResolvedForm(false); 
-      setCommitLink(''); 
+      setShowResolvedForm(false);
+      setCommitLink('');
       selectedBug.solution_status = "Resolved";
-     
+
     } catch (error) {
       alert('Failed to mark bug as resolved.');
     }
   };
 
-   // Create a new bug
-   function handleCreateBug() {
+  // Create a new bug
+  function handleCreateBug() {
     if (!severityLevel || !solvePriority || !bugDescription) {
       alert('Severity level, solve priority and bug description are all required.');
       return;
     }
-  
+
     const requestBody = {
       id_project: selectedProjectId,
       commit_link: commitLinkReport,
@@ -136,21 +136,21 @@ function MyHome() {
       id_commit_report_bug: 0,
       id_user_reporter: userId,
     };
-  
+
     axios
       .post('http://localhost:3000/bugs/createNewBug', requestBody)
       .then((response) => {
         if (response.status === 200) {
           alert('Bug created successfully!');
-          
+
           setBugDescription('');
           setBugCommitLinkReport('');
           setSeverityLevel('');
           setSolvePriority('');
-          setIsAddingBug(false); 
+          setIsAddingBug(false);
 
           console.log(isAddingBug);
-          
+
           if (selectedProjectId) {
             fetchBugsByProjectId(selectedProjectId)
               .then((data) => {
@@ -165,13 +165,13 @@ function MyHome() {
         alert('Error creating bug');
       });
   }
-  
+
 
 
   const containerStyle = {
     display: 'flex',
     flexDirection: 'row',
-    padding: '100px',
+    padding: '50px',
     gap: '20px',
   };
 
@@ -210,16 +210,20 @@ function MyHome() {
   const selectedProjectName = projects.find((project) => project.id_project === selectedProjectId)?.project_name || '';
 
   return (
-    <div 
-          className = 'containerProjects'>
-          <h3>All Projects</h3>
-      <div 
-        className='largeContainer'
-        style={containerStyle}>
-        <div 
+    <div
+      className='largeContainer'
+      style = {{maxHeight: '200px'}}>
+      <h3>Dashboard</h3>
+      <div
+        className='containerProjects'
+        >
+        
+        <div style={titleStyle}>My Projects</div>
+
+        <div
           className='containerProjects'
-          style={{overflowY: 'auto', maxHeight: '600px', maxWidth: '700'}}>
-          <div style={titleStyle}>My Projects</div>
+          style={{ overflowY: 'auto', maxHeight: '200px', width: '100%' }}>
+          
           <table style={tableStyle}>
             <thead>
               <tr>
@@ -247,146 +251,22 @@ function MyHome() {
               })}
             </tbody>
           </table>
-         {/* <button
+          {/* <button
             className='button'
             onClick={() => selectedProjectId && fetchBugsByProjectId(selectedProjectId)}
             disabled={!selectedProjectId}
           >
           </button>
 */}
-          <button 
-          onClick={toggleAddBug}
-          className="button">
 
-           {isAddingBug ? 'Cancel' : 'Report a new Bug'}
-        </button>
 
-         {isAddingBug && (
-      <div
-        className='containerProjects'
-        style={{ display: 'flex', gap: '20px' }}
-      >
-        <div style={{ flex: 1 }}>
-          <h3>Report a Bug</h3>
-
-          
-          <div style={{ marginBottom: '10px' }}>
-            <label>Severity Level:</label>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  name="severityLevel"
-                  value="critical"
-                  checked={severityLevel === 'critical'}
-                  onChange={(e) => setBugSeverityLevel(e.target.value)}
-                />
-                Critical
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="severityLevel"
-                  value="major"
-                  checked={severityLevel === 'major'}
-                  onChange={(e) => setBugSeverityLevel(e.target.value)}
-                />
-                Major
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="severityLevel"
-                  value="minor"
-                  checked={severityLevel === 'minor'}
-                  onChange={(e) => setBugSeverityLevel(e.target.value)}
-                />
-                Minor
-              </label>
-            </div>
-          </div>
-
-      
-      <div style={{ marginBottom: '10px' }}>
-        <label>Solve Priority:</label>
-        <div>
-          <label>
-            <input
-              type="radio"
-              name="solvePriority"
-              value="high"
-              checked={solvePriority === 'high'}
-              onChange={(e) => setSolvePriority(e.target.value)}
-            />
-            High
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="solvePriority"
-              value="medium"
-              checked={solvePriority === 'medium'}
-              onChange={(e) => setSolvePriority(e.target.value)}
-            />
-            Medium
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="solvePriority"
-              value="low"
-              checked={solvePriority === 'low'}
-              onChange={(e) => setSolvePriority(e.target.value)}
-            />
-            Low
-          </label>
+   
         </div>
-      </div>
 
-      
-      <div style={{ marginBottom: '10px' }}>
-        <label>
-          Bug Description:
-              <input
-                type="text"
-                placeholder="Enter Bug Description"
-                value={bugDescription}
-                onChange={(e) => setBugDescription(e.target.value)}
-                className='inputContainer'
-              />
-            </label>
-          </div>
 
-          <div style={{ marginBottom: '10px' }}>
-        <label>
-          Commit Link:
-              <input
-                type="text"
-                placeholder="Enter Commit Link"
-                value={commitLinkReport}
-                onChange={(e) => setBugCommitLinkReport(e.target.value)}
-                className='inputContainer'
-              />
-            </label>
-          </div>
-
-          <div>
-            <button 
-              className="button"
-              onClick={handleCreateBug}>
-              Submit
-            </button>
-          </div>
-        </div>
-      </div>
-      
-    )} 
-    </div>
-    
-
-        <div 
+        <div
           className='containerProjects'
-          style={{overflowY: 'auto', maxHeight: '400px', maxWidth: '500'}}>
+          style={{ overflowY: 'auto', maxHeight: '500px', width: '800px' }}>
           <div style={titleStyle}>Reported bugs for project {selectedProjectName}</div>
           {selectedProjectId ? (
             <div>
@@ -418,16 +298,16 @@ function MyHome() {
                   ))}
                 </tbody>
               </table>
-              
-              
+
+
               <button
                 className='button'
                 onClick={handleResolvedBug}
-                disabled={!selectedBug || selectedBug.solution_status.toUpperCase() === 'RESOLVED' || selectedBug.id_user_solver !== configuration.currentUserId }
+                disabled={!selectedBug || selectedBug.solution_status.toUpperCase() === 'RESOLVED' || selectedBug.id_user_solver !== configuration.currentUserId}
               >
                 Resolve Bug
               </button>
-              
+
               {/* Formular pentru rezolvarea bugului */}
               {showResolvedForm && (
                 <form onSubmit={handleResolvedSubmit}>
@@ -445,14 +325,154 @@ function MyHome() {
                 </form>
               )}
             </div>
-            
+
           ) : (
             <div>Please select a project from the left panel to see its bugs.</div>
           )}
         </div>
       </div>
+
+
+      <div>
+        <button
+          onClick={toggleAddBug}
+          className="button">
+
+          {isAddingBug ? 'Cancel' : 'Report a new Bug'}
+        </button>
+
+        {isAddingBug && (
+            <div
+              className='containerProjects'
+              style={{ display: 'flex', gap: '20px' }}
+            >
+              <div style={{ flex: 1 }}>
+                <h3>Report a Bug</h3>
+
+
+                <div style={{ marginBottom: '10px' }}>
+                  <label>Severity Level:</label>
+                  <div>
+                    <label>
+                      <input
+                        className='inputContainer'
+                        type="radio"
+                        name="severityLevel"
+                        value="critical"
+                        checked={severityLevel === 'critical'}
+                        onChange={(e) => setBugSeverityLevel(e.target.value)}
+                      />
+                      Critical
+                    </label>
+                    <label>
+                      <input
+                        className='inputContainer'
+                        type="radio"
+                        name="severityLevel"
+                        value="major"
+                        checked={severityLevel === 'major'}
+                        onChange={(e) => setBugSeverityLevel(e.target.value)}
+                      />
+                      Major
+                    </label>
+                    <label>
+                      <input
+                        className='inputContainer'
+                        type="radio"
+                        name="severityLevel"
+                        value="minor"
+                        checked={severityLevel === 'minor'}
+                        onChange={(e) => setBugSeverityLevel(e.target.value)}
+                      />
+                      Minor
+                    </label>
+                  </div>
+                </div>
+
+
+                <div style={{ marginBottom: '10px' }}>
+                  <label>Solve Priority:</label>
+                  <div>
+                    <label>
+                      <input
+                        className='inputContainer'
+                        type="radio"
+                        name="solvePriority"
+                        value="high"
+                        checked={solvePriority === 'high'}
+                        onChange={(e) => setSolvePriority(e.target.value)}
+                      />
+                      High
+                    </label>
+                    <label>
+                      <input
+                        className='inputContainer'
+                        type="radio"
+                        name="solvePriority"
+                        value="medium"
+                        checked={solvePriority === 'medium'}
+                        onChange={(e) => setSolvePriority(e.target.value)}
+                      />
+                      Medium
+                    </label>
+                    <label>
+                      <input
+                        className='inputContainer'
+                        type="radio"
+                        name="solvePriority"
+                        value="low"
+                        checked={solvePriority === 'low'}
+                        onChange={(e) => setSolvePriority(e.target.value)}
+                      />
+                      Low
+                    </label>
+                  </div>
+                </div>
+
+
+                <div style={{ marginBottom: '10px' }}>
+                  <label>
+                    Bug Description:
+                    <input
+                      type="text"
+                      placeholder="Enter Bug Description"
+                      value={bugDescription}
+                      onChange={(e) => setBugDescription(e.target.value)}
+                      className='inputContainer'
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '10px' }}>
+                  <label>
+                    Commit Link:
+                    <input
+                      type="text"
+                      placeholder="Enter Commit Link"
+                      value={commitLinkReport}
+                      onChange={(e) => setBugCommitLinkReport(e.target.value)}
+                      className='inputContainer'
+                    />
+                  </label>
+                </div>
+
+                <div>
+                  <button
+                    className="button"
+                    onClick={handleCreateBug}>
+                    SubmitBug
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          )}
+      </div>
+
     </div>
-  
+
+
+
   );
 }
 
