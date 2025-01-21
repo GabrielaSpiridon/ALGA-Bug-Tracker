@@ -190,6 +190,8 @@ function MyHome() {
   };
 
   const tableStyle = {
+    
+    maxWidth: '80%',
     width: '100%',
     borderCollapse: 'collapse',
   };
@@ -267,10 +269,10 @@ function MyHome() {
         <div
           className='containerProjects'
           style={{ overflowY: 'auto', maxHeight: '500px', width: '800px' }}>
-          <div style={titleStyle}>Reported bugs for project {selectedProjectName}</div>
+          <div  style={titleStyle}>Reported bugs for project {selectedProjectName}</div>
           {selectedProjectId ? (
             <div>
-              <table style={tableStyle}>
+              <table className= 'table' style={tableStyle}>
                 <thead>
                   <tr>
                     <th style={thTdStyle}>ID</th>

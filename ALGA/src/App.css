@@ -13,7 +13,7 @@ html, body, #root {
   max-width: none; 
   display: flex; /* Optional: Use Flexbox for layout */
   flex-direction: column;
-  padding-top: 120px; /* Match this to the navbar's height */
+  padding-top: 80px; /* Match this to the navbar's height */
 }
 
 .logo {
@@ -218,4 +218,11 @@ html, body, #root {
   background-size: cover;
   z-index: -1;
   opacity: 1; /* Make the background semi-transparent */
+}
+
+.table {
+  max-width: 80%;
+  overflow-x: auto;
+  width: '100%';
+
 }
