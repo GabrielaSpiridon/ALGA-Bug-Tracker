@@ -338,8 +338,9 @@ function MyHome() {
       <div>
         <button
           onClick={toggleAddBug}
-          className="button">
-
+          className="button"
+          disabled={!selectedProjectId}>
+          
           {isAddingBug ? 'Cancel' : 'Report a new Bug'}
         </button>
 

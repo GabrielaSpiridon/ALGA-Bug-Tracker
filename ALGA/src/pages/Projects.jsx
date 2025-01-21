@@ -160,12 +160,7 @@ function Projects() {
 
   return (
     <div 
-      className='projectsMainContainer'
-      style={{
-        width: '90%', 
-        maxHeight: '500px', 
-        margin: '0 auto', 
-        padding: '30px' }}>
+      className='largeContainer'>
       
       <div 
         className='containerProjects'
@@ -265,10 +260,11 @@ function Projects() {
 
 
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
+      <div style={{ display: 'flex', gap: '2%' }}>
         {/* All Projects */}
         <div 
-          className = 'containerProjects'>
+          className = 'containerProjects'
+            style = {{width: "100%"}}>
           <h3>All Projects</h3>
           <div style={{overflowY: 'auto', maxHeight: '400px'}}>
             <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
@@ -307,7 +303,8 @@ function Projects() {
 
         {/* Project Details */}
         <div
-           className="containerProjects" >
+           className="containerProjects" 
+           style = {{width: "100%"}}>
           <h3>Project Details</h3>
           {selectedProject ? (
             <div>
