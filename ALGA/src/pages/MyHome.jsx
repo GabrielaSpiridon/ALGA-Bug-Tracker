@@ -48,6 +48,7 @@ function MyHome() {
 
   const navigate = useNavigate();
 
+  const [isAddingBug, setIsAddingBug] = useState(false);
   const [projects, setProjects] = useState([]);
   const [bugs, setBugs] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
@@ -55,6 +56,11 @@ function MyHome() {
   const [commitLink, setCommitLink] = useState('');
   const [showResolvedForm, setShowResolvedForm] = useState(false);
   
+
+  const toggleAddBug = () => {
+    setIsAddingBug(!isAddingBug);
+  };
+
 
   useEffect(() => {
     if (!userId || userId === 0) {
@@ -110,6 +116,49 @@ function MyHome() {
     }
   };
 
+   // Create a new bug
+   function handleCreateBug() {
+    if (!severityLevel || !solvePriority || !bugDescription) {
+      alert('Severity level, solve priority and bug description are all require.');
+      return;
+    }
+
+
+    const requestBody = {
+      id_project:idProject,
+      commit_link:commitLink,
+      severity_level:severityLevel, 
+      solve_priority:solvePriority,
+      bug_description:bugDescription,
+      solution_status:"Unresolved",
+      id_commit_report_bug:0,
+      id_user_reporter:currentUserId,
+    
+    };
+
+    axios
+      .post('http://localhost:3000/bugs/createNewBug', requestBody)
+      .then((response) => {
+        if (response.status === 200) {
+          alert('Bug created successfully!');
+
+          const BugIdNumber = Number(response.data.insertId);
+          console.log('Bug ID as Number:', BugIdNumber);
+
+          
+
+          setBug('');
+          setBugDescription('');
+          setBugCommitLink(''); 
+          setIsAddingBug(false);
+          //fetchAllProjects();
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to create bug:', error);
+        alert('Error creating bug');
+      });
+  }
 
 
   const containerStyle = {
@@ -191,14 +240,133 @@ function MyHome() {
               })}
             </tbody>
           </table>
-          <button
+         {/* <button
             className='button'
             onClick={() => selectedProjectId && fetchBugsByProjectId(selectedProjectId)}
             disabled={!selectedProjectId}
           >
-            Report New Bug
           </button>
+*/}
+          <button 
+          onClick={toggleAddBug}
+          className="button">
+
+           {isAddingBug ? 'Cancel' : 'Report a new Bug'}
+        </button>
+
+         {isAddingBug && (
+      <div
+        className='containerProjects'
+        style={{ display: 'flex', gap: '20px' }}
+      >
+        <div style={{ flex: 1 }}>
+          <h3>Report a Bug</h3>
+
+          
+          <div style={{ marginBottom: '10px' }}>
+            <label>Severity Level:</label>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="severityLevel"
+                  value="critical"
+                  checked={severityLevel === 'critical'}
+                  onChange={(e) => setBugSeverityLevel(e.target.value)}
+                />
+                Critical
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="severityLevel"
+                  value="major"
+                  checked={severityLevel === 'major'}
+                  onChange={(e) => setBugSeverityLevel(e.target.value)}
+                />
+                Major
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="severityLevel"
+                  value="minor"
+                  checked={severityLevel === 'minor'}
+                  onChange={(e) => setBugSeverityLevel(e.target.value)}
+                />
+                Minor
+              </label>
+            </div>
+          </div>
+
+      
+      <div style={{ marginBottom: '10px' }}>
+        <label>Solve Priority:</label>
+        <div>
+          <label>
+            <input
+              type="radio"
+              name="solvePriority"
+              value="high"
+              checked={solvePriority === 'high'}
+              onChange={(e) => setSolvePriority(e.target.value)}
+            />
+            High
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="solvePriority"
+              value="medium"
+              checked={solvePriority === 'medium'}
+              onChange={(e) => setSolvePriority(e.target.value)}
+            />
+            Medium
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="solvePriority"
+              value="low"
+              checked={solvePriority === 'low'}
+              onChange={(e) => setSolvePriority(e.target.value)}
+            />
+            Low
+          </label>
         </div>
+      </div>
+
+      
+      <div style={{ marginBottom: '10px' }}>
+        <label>
+          Bug Description:
+              <input
+                type="text"
+                placeholder="Enter Bug Description"
+                value={bugDescription}
+                onChange={(e) => setBugDescription(e.target.value)}
+                className='inputContainer'
+              />
+            </label>
+          </div>
+
+          <div style={{ marginBottom: '10px' }}>
+        <label>
+          Commit Link:
+              <input
+                type="text"
+                placeholder="Enter Commit Link"
+                value={bugDescription}
+                onChange={(e) => setBugCommitLink(e.target.value)}
+                className='inputContainer'
+              />
+            </label>
+          </div>
+        </div>
+      </div>
+    )} 
+    </div>
+    
 
         <div 
           className='containerProjects'
@@ -234,6 +402,7 @@ function MyHome() {
                   ))}
                 </tbody>
               </table>
+              
               
               <button
                 className='button'
