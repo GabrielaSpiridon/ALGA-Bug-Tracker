@@ -57,7 +57,7 @@ function MyHome() {
   const [showResolvedForm, setShowResolvedForm] = useState(false);
   const [commitLinkReport, setBugCommitLinkReport] = useState('');
   const [bugDescription, setBugDescription] = useState('');
-  const [severityLevel, setBugSeverityLevel] = useState('');
+  const [severityLevel, setSeverityLevel] = useState('');
   const [solvePriority, setSolvePriority] = useState('');
 
   const toggleAddBug = () => {
@@ -140,7 +140,7 @@ function MyHome() {
     axios
       .post('http://localhost:3000/bugs/createNewBug', requestBody)
       .then((response) => {
-        if (response.status === 200) {
+        if (response.status === 201) {
           alert('Bug created successfully!');
 
           setBugDescription('');
@@ -362,7 +362,7 @@ function MyHome() {
                         name="severityLevel"
                         value="critical"
                         checked={severityLevel === 'critical'}
-                        onChange={(e) => setBugSeverityLevel(e.target.value)}
+                        onChange={(e) => setSeverityLevel(e.target.value)}
                       />
                       Critical
                     </label>
@@ -373,7 +373,7 @@ function MyHome() {
                         name="severityLevel"
                         value="major"
                         checked={severityLevel === 'major'}
-                        onChange={(e) => setBugSeverityLevel(e.target.value)}
+                        onChange={(e) => setSeverityLevel(e.target.value)}
                       />
                       Major
                     </label>
@@ -384,7 +384,7 @@ function MyHome() {
                         name="severityLevel"
                         value="minor"
                         checked={severityLevel === 'minor'}
-                        onChange={(e) => setBugSeverityLevel(e.target.value)}
+                        onChange={(e) => setSeverityLevel(e.target.value)}
                       />
                       Minor
                     </label>
