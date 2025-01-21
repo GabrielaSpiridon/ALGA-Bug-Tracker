@@ -12,12 +12,11 @@ Aplicație web pentru gestionarea rezolvării bug-urilor
 **Frontend:** React.js
 	     - vom folosi AXIOS pentru a comunica cu API-ul de tip REST și pentru a obține sau trimite date către și de la un server
 	     - în principiu, nu planificăm să avem nevoie de state manager
-**Styling:** Tailwind CSS
+**Styling:** Bootstrap CSS
 
 **Development Environment:** Visual Studio Code
  
-**Mod de prezentare:** Opțiunea 1: Laptopul personal la seminar
-			Opțiunea 2: Hosting RoMarg ( vom confirma ulterior URL-ul exact)
+**Mod de prezentare:** Laptopul personal la seminar
 
 **Version Control:** GitHub
 
