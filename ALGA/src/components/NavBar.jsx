@@ -4,7 +4,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 function NavBar({ isAuthenticated, onLogout }) {
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light p-3 shadow-sm fixed-top">
+    <nav className="navbar navbar-expand-lg navbar-light bg-light p-3 shadow-sm fixed-top"
+        height = '30px' >
       <div className="container-fluid">
         {/* Left-side Brand */}
         
@@ -35,8 +36,7 @@ function NavBar({ isAuthenticated, onLogout }) {
         <div className="collapse navbar-collapse" id="navbarNav">
           {/* Navigation items aligned to the right */}
           <ul className="navbar-nav ms-auto">
-            <li className="navBarButton"
-                  onHover >
+            <li className="navBarButton" >
               <Link className="nav-link" to="/myHome">
                 Dashboard
               </Link>
