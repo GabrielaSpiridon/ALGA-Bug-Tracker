@@ -55,7 +55,10 @@ function MyHome() {
   const [selectedBug, setSelectedBug] = useState(null);
   const [commitLink, setCommitLink] = useState('');
   const [showResolvedForm, setShowResolvedForm] = useState(false);
-  
+  const [commitLinkReport, setBugCommitLinkReport] = useState('');
+  const [bugDescription, setBugDescription] = useState('');
+  const [severityLevel,setBugSeverityLevel] = useState('');
+  const [solvePriority,setSolvePriority] = useState('');
 
   const toggleAddBug = () => {
     setIsAddingBug(!isAddingBug);
@@ -125,14 +128,14 @@ function MyHome() {
 
 
     const requestBody = {
-      id_project:idProject,
-      commit_link:commitLink,
+      id_project:selectedProjectId,
+      commit_link:commitLinkReport,
       severity_level:severityLevel, 
       solve_priority:solvePriority,
       bug_description:bugDescription,
       solution_status:"Unresolved",
       id_commit_report_bug:0,
-      id_user_reporter:currentUserId,
+      id_user_reporter:userId,
     
     };
 
@@ -151,7 +154,8 @@ function MyHome() {
           setBugDescription('');
           setBugCommitLink(''); 
           setIsAddingBug(false);
-          //fetchAllProjects();
+          fetchAllProjects();
+
         }
       })
       .catch((error) => {
@@ -356,14 +360,23 @@ function MyHome() {
               <input
                 type="text"
                 placeholder="Enter Commit Link"
-                value={bugDescription}
-                onChange={(e) => setBugCommitLink(e.target.value)}
+                value={commitLinkReport}
+                onChange={(e) => setBugCommitLinkReport(e.target.value)}
                 className='inputContainer'
               />
             </label>
           </div>
+
+          <div>
+            <button 
+              className="button"
+              onClick={handleCreateBug}>
+              Submit
+            </button>
+          </div>
         </div>
       </div>
+      
     )} 
     </div>
     
@@ -429,6 +442,7 @@ function MyHome() {
                 </form>
               )}
             </div>
+            
           ) : (
             <div>Please select a project from the left panel to see its bugs.</div>
           )}
