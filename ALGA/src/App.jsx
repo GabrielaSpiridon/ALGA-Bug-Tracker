@@ -54,7 +54,7 @@ function App() {
               <div>
                 <Login onLoginSuccess={handleLoginSuccess} />
                 <div className="text-center mt-3">
-                  <Link to="/register" className="btn btn-secondary">Go to Register</Link>
+                  
                 </div> 
               </div>
             )} 

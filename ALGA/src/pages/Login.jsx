@@ -78,38 +78,42 @@ function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="loginLargeContainer">
-      <div style={{ width: "100%", maxWidth: "400px" }}>
-        <h2 className="text-center mb-4">Login to ALGABugTracker</h2>
-        <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
-          <div className="loginInputContainer">
-            <input 
-              type="text" 
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)} 
-              className="form-control"
-            />
-          </div>
-          <div 
-            className="loginInputContainer">
-            <input 
-              type="password" 
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)} 
-              className="form-control"
-            />
-          </div>
-          <button className="loginButton" type="submit">Login</button>
-          <button 
-            className="loginButton"
-            type="button" 
-            onClick={() => navigate('/register')}
-          >
-            Register
-          </button>
-        </form>
+    <div>
+      
+      <div className="loginLargeContainer">
+        
+        <div style={{ width: "100%", maxWidth: "400px" }}>
+          <h2 className="text-center mb-4">Login to ALGABugTracker</h2>
+          <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
+            <div>
+              <input 
+                type="text" 
+                placeholder="Username:"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)} 
+                className="loginInputContainer"
+              />
+            </div>
+            <div >
+              <input 
+                type="password" 
+                placeholder="Password:"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)} 
+                className="loginInputContainer"
+              />
+            </div>
+            <button className="loginButton" type="submit">Login</button>
+            <button 
+              className="loginButton"
+              type="button" 
+              onClick={() => navigate('/register')}
+            >
+              Register
+            </button>
+
+          </form>
+        </div>
       </div>
     </div>
   );

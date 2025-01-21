@@ -171,7 +171,7 @@ function Projects() {
           onClick={toggleAddProject}
           className="button">
 
-          {isAddingProject ? 'Cancel' : '+'}
+          {isAddingProject ? 'Cancel' : '+ ADD PROJECT'}
         </button>
       </div>
 
@@ -220,7 +220,7 @@ function Projects() {
                     <label>
                       <input
                         type="checkbox"
-                        className='inputContainer'
+                        className='button'
                         value={user.id_user}
                         onChange={(e) => {
                           const userId = parseInt(e.target.value, 10);

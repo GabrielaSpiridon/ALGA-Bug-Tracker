@@ -7,9 +7,18 @@ function NavBar({ isAuthenticated, onLogout }) {
     <nav className="navbar navbar-expand-lg navbar-light bg-light p-3 shadow-sm fixed-top">
       <div className="container-fluid">
         {/* Left-side Brand */}
-        <Link className="navbar-brand" to="/">
+        
+        <img 
+          src="algaLogo.svg"
+          height= '60px'
+          width= '60px'>
+          </img>
+        
+        <Link className="navbar-brand" to="/"
+          style={{padding: '20px'}}>
           ALGA Bug Tracker
         </Link>
+        
         <button
           className="navbar-toggler"
           type="button"
@@ -26,7 +35,8 @@ function NavBar({ isAuthenticated, onLogout }) {
         <div className="collapse navbar-collapse" id="navbarNav">
           {/* Navigation items aligned to the right */}
           <ul className="navbar-nav ms-auto">
-            <li className="navBarButton">
+            <li className="navBarButton"
+                  onHover >
               <Link className="nav-link" to="/myHome">
                 Dashboard
               </Link>
