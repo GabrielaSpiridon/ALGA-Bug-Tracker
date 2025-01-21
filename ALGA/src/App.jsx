@@ -1,5 +1,7 @@
 //App.jsx
 import React, { useState, useEffect } from 'react';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min";
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Login from './pages/Login';
@@ -42,9 +44,9 @@ function App() {
             element={isAuthenticated ? <Navigate to="/myHome" /> : (
               <div>
                 <Login onLoginSuccess={handleLoginSuccess} />
-                 <div className="text-center mt-3">
+                 {/* <div className="text-center mt-3">
                   <Link to="/register" className="btn btn-secondary">Go to Register</Link>
-                </div>
+                </div> */}
               </div>
             )} 
           />

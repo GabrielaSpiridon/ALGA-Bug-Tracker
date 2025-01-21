@@ -1,29 +1,26 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 function NavBar({ isAuthenticated, onLogout }) {
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light p-3 shadow-sm fixed-top"
-        height = '30px' >
+    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm fixed-top">
       <div className="container-fluid">
-        {/* Left-side Brand */}
-        
-        <img 
-          src="algaLogo.svg"
-          height= '60px'
-          width= '60px'>
-          </img>
-        
-        <Link className="navbar-brand" to="/"
-          style={{padding: '20px'}}>
-          ALGA Bug Tracker
+        {/* Logo and Brand */}
+        <Link to="/" className="navbar-brand d-flex align-items-center">
+          <img
+            src="algaLogo.svg"
+            alt="Logo"
+            height="40"
+            className="me-2"
+          />
+          <span>ALGA Bug Tracker</span>
         </Link>
-        
+
+        {/* Toggler for Mobile */}
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collap  se"
+          data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
           aria-controls="navbarNav"
           aria-expanded="false"
@@ -31,39 +28,44 @@ function NavBar({ isAuthenticated, onLogout }) {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-        
-        {/* Collapsible content */}
+
+        {/* Collapsible Menu */}
         <div className="collapse navbar-collapse" id="navbarNav">
-          {/* Navigation items aligned to the right */}
           <ul className="navbar-nav ms-auto">
-            <li className="navBarButton" >
+            {/* Navigation Links */}
+            <li className="nav-item">
               <Link className="nav-link" to="/myHome">
                 Dashboard
               </Link>
             </li>
-            <li className="navBarButton">
+            <li className="nav-item">
               <Link className="nav-link" to="/projects">
                 Projects
               </Link>
             </li>
-            <li className="navBarButton">
+            <li className="nav-item">
               <Link className="nav-link" to="/bugs">
                 Bugs
               </Link>
             </li>
-            
           </ul>
+
+          {/* Authentication Button */}
+          <div className="d-flex">
+            {isAuthenticated ? (
+              <button onClick={onLogout} className="btn btn-outline-primary ms-3">
+                Logout
+              </button>
+            ) : (
+              <Link to="/login" className="btn btn-primary ms-3">
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
-      {isAuthenticated ? (
-        <button onClick={onLogout} className="loginNavBarButton">
-          Logout
-        </button>
-      ) : (
-        <Link to="/login" className="loginNavBarButton">Login</Link>
-      )}
     </nav>
   );
-};
+}
 
 export default NavBar;
